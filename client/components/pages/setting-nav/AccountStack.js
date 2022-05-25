@@ -3,7 +3,7 @@ import { View, Text, Button } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Account from './Account';
 import Settings from './Settings';
-import ForgetPassword from './ForgetPassword';
+import ChangePassword from './ChangePassword';
 import Personal from './Personal'
 
 const Stack = createNativeStackNavigator();
@@ -13,7 +13,7 @@ const SettingStack = () => {
         <Stack.Navigator>
             <Stack.Screen name="Account" component={Account} />
             <Stack.Screen name="Personal" component={Personal} />
-            <Stack.Screen name="Forget Password" component={ForgetPassword} />
+            <Stack.Screen name="Change Password" component={ChangePassword} />
             <Stack.Screen name="Settings" component={Settings} />
         </Stack.Navigator>
     )
