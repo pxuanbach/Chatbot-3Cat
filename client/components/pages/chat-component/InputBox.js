@@ -9,6 +9,16 @@ import { SimpleLineIcons } from '@expo/vector-icons';
 const InputBox = () => {
   const [message, setMessage] = useState('');
 
+  const handleSpeechToText = () => {
+
+  }
+
+  const handleSendMessage = () => {
+    if (message) {
+      console.log(message)
+    }
+  }
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS == "ios" ? "padding" : "height"}
@@ -17,7 +27,7 @@ const InputBox = () => {
     >
       <View style={styles.container}>
         <View style={styles.mainContainer}>
-        <TouchableOpacity onPress={() => { }}>
+        <TouchableOpacity onPress={handleSpeechToText}>
           <View style={styles.buttonContainer}>
           <SimpleLineIcons name="microphone" size={24} color="#7046E7" />
           </View>
@@ -29,7 +39,7 @@ const InputBox = () => {
           value={message}
           onChangeText={setMessage}
         />
-        <TouchableOpacity>
+        <TouchableOpacity onPress={handleSendMessage}>
           <View style={styles.buttonContainer}>
             <Octicons name="paper-airplane" size={24} color="#7046E7" />
           </View>
@@ -45,7 +55,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-end',
     backgroundColor: 'transparent',
-    marginHorizontal: 10
+    marginHorizontal: 10,
+    marginBottom: 10,
+    marginTop: 2
   },
   mainContainer: {
     flexDirection: 'row',
@@ -69,7 +81,8 @@ const styles = StyleSheet.create({
   textInput: {
     flex: 1,
     fontSize: 18,
-    marginHorizontal: 10
+    marginHorizontal: 10,
+    maxHeight: 86
   },
 })
 
