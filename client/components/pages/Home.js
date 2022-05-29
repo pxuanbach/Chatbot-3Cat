@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Text, View, Image, TouchableOpacity } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import Chat from './Chat'
+import Chat from './chat-component/Chat'
 import AccountStack from './setting-nav/AccountStack';
 import Tabbar from '../reusable/Tabbar'
 
@@ -18,6 +18,8 @@ const Home = () => {
           headerTitleAlign: 'center',
           headerStyle: {
             backgroundColor: '#F2F4F8',
+            elevation: 0,
+            shadowOpacity: 0
           },
           headerTitle: (props) => (
             <View {...props} style={{ flexDirection: 'row', alignItems: 'center' }}>
