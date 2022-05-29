@@ -4,7 +4,7 @@ import LinearGradientBackground from '../reusable/LinearGradientBackground';
 
 const LogIn = ({ navigation }) => {
   return (
-    <View style={{flex: 1, backgroundColor: 'rgba(255, 255, 255, 0.78)'}}>
+    <View style={{flex: 1, backgroundColor: 'rgba(255, 255, 255, 1)'}}>
       <LinearGradientBackground></LinearGradientBackground>
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
         <Text>Log In Screen</Text>
