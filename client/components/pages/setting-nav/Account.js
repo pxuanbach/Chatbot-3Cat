@@ -17,6 +17,10 @@ const Account = ({navigation}) => {
         title="Settings"
         onPress={() => navigation.navigate('Settings')}
       ></Button>
+      <Button
+        title="Change Password"
+        onPress={() => navigation.navigate('Change Password')}
+      ></Button>
     </View>
   )
 }
