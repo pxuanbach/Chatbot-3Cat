@@ -8,7 +8,7 @@ const LogIn = ({ navigation }) => {
   const [password, onChangePassword] = React.useState('');
 
   return (
-    <View style={{flex: 1, backgroundColor: 'rgba(255, 255, 255, 0.78)'}}>
+    <View style={{flex: 1, backgroundColor: 'rgba(255, 255, 255, 1)'}}>
       <LinearGradientBackground></LinearGradientBackground>
       <View style={styles.container}>
         <Text style={styles.titleText}>Hello again!</Text>
