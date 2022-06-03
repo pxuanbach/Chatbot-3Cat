@@ -9,7 +9,7 @@ const createJWT = id => {
 }
 
 const alertError = (err) => {
-    let errors = { username: '', password: '', name: '', email: '' }
+    let errors = { username: '', password: '', name: '', email: '', phone: '' }
     if (err.message === 'incorrect username') {
         errors.username = 'This username not found';
         return errors;
@@ -20,11 +20,13 @@ const alertError = (err) => {
     }
     if (err.code === 11000) {
         if (err.message.includes('username')) {
-            errors.username = 'This user already registered'
+            errors.username = 'Username already registered'
         }
-
         if (err.message.includes('email')) {
-            errors.email = 'This email already registered';
+            errors.email = 'Email already registered';
+        }
+        if (err.message.includes('phone')) {
+            errors.phone = 'Phone number already registered';
         }
         return errors;
     }
@@ -37,10 +39,16 @@ const alertError = (err) => {
 }
 
 module.exports.signup = async (req, res) => {
-    const { username, password, name, email } = req.body;
+    const { username, password, email, phone } = req.body;
 
     try {
-        const user = await User.create({ username, password, img_url, cloudinary_id, name, email });
+        const user = await User.create({ 
+            username, 
+            password, 
+            name: username, 
+            email, 
+            phone
+        });
         res.status(201).json(user);
     } catch (error) {
         let errors = alertError(error);
@@ -52,12 +60,11 @@ module.exports.signup = async (req, res) => {
 
 module.exports.login = async (req, res) => {
     const { username, password } = req.body;
-    //console.log(req.body)
+    console.log(req.body)
     try {
         const user = await User.login(username, password);
         const token = createJWT(user._id);
-        //res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 1000 })
-        res.status(201).json({ user });
+        res.status(201).json({ user, token });
     } catch (error) {
         let errors = alertError(error);
         console.log(error.message)
@@ -66,7 +73,7 @@ module.exports.login = async (req, res) => {
     res.send()
 }
 module.exports.verifyuser = (req, res, next) => {
-    const token = req.cookies.jwt;
+    const token = req.params.token;
     //console.log(req.cookies.jwt)
     if (token) {
         jwt.verify(token, 'chatbot secret', async (err, decodedToken) => {
@@ -84,6 +91,6 @@ module.exports.verifyuser = (req, res, next) => {
     }
 }
 module.exports.logout = (req, res) => {
-    //res.cookie('jwt', "", { maxAge: 1 })
+    //do something
     res.status(200).json({ logout: true })
 }
