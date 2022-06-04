@@ -1,23 +1,63 @@
-import React from 'react'
-import { StyleSheet, View, Text, Pressable, TextInput, TouchableOpacity } from 'react-native';
+import React, { useState, useContext } from 'react'
+import {
+  StyleSheet, View, Text, Pressable,
+  TextInput, TouchableOpacity
+} from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import LinearGradientBackground from '../reusable/LinearGradientBackground';
+import axiosInstance from '../../AxiosInstance';
+import { UserContext } from '../../UserContext';
 
 const LogIn = ({ navigation }) => {
+  const {user, setUser} = useContext(UserContext);
+  const [username, onChangeUsername] = useState('');
+  const [password, onChangePassword] = useState('');
 
-  const [username, onChangeUsername] = React.useState('');
-  const [password, onChangePassword] = React.useState('');
+  const handleLogin = async () => {
+    console.log(username, password)
+    axiosInstance.post('/login',
+      JSON.stringify({
+        "username": username,
+        "password": password
+      }), {
+      headers: { "Content-Type": "application/json" }
+    }).then(async (response) => {
+      //response.data
+      //console.log("data", response.data.token)
+      setUser(response.data.user);
+      await AsyncStorage.setItem('@storage_token', response.data.token)
+    }).catch(err => {
+      //err.response.data
+      console.log("error", err.response)
+    })
+    //navigation.navigate('Home');
+  }
 
   return (
-    <View style={{flex: 1, backgroundColor: 'rgba(255, 255, 255, 1)'}}>
+    <View style={{ flex: 1, backgroundColor: 'rgba(255, 255, 255, 1)' }}>
       <LinearGradientBackground></LinearGradientBackground>
       <View style={styles.container}>
         <Text style={styles.titleText}>Hello again!</Text>
         <Text>{"\n"}</Text>
-        <Text style={styles.subtitleText}>Welcome to 3Cat. Please enter your username and password to access with your personal account</Text>
+        <Text style={styles.subtitleText}>
+          Welcome to 3Cat. Please enter your username and password
+          to access with your personal account
+        </Text>
       </View>
       <View style={styles.formContainer} >
-        <TextInput style={styles.input} onChangeText={onChangeUsername} value={username} placeholder='Enter username'/>
-        <TextInput style={styles.input} onChangeText={onChangePassword} value={password} placeholder='Enter password' secureTextEntry={true}/>
+        <TextInput
+          style={styles.input}
+          onChangeText={onChangeUsername}
+          value={username}
+          placeholder='Enter username'
+        />
+        <TextInput
+          style={styles.input}
+          onChangeText={onChangePassword}
+          value={password}
+          placeholder='Enter password'
+          secureTextEntry={true}
+        />
         <View style={styles.forgotPassword}>
           <TouchableOpacity
             onPress={() => navigation.navigate('Forget Password')}>
@@ -26,12 +66,12 @@ const LogIn = ({ navigation }) => {
         </View>
       </View>
       <View style={styles.btnContainer}>
-        <Pressable style={styles.btn} onPress={() => navigation.navigate('Home')}>
+        <Pressable style={styles.btn} onPress={handleLogin}>
           <Text style={styles.btnContent}>LOGIN</Text>
         </Pressable>
         <Text style={styles.subtitleText}>Or countinue with</Text>
         <View style={styles.register}>
-          <Text style={{fontSize: 16}}>Not a member? </Text>
+          <Text style={{ fontSize: 16 }}>Not a member? </Text>
           <TouchableOpacity
             onPress={() => navigation.navigate('Sign Up')}>
             <Text style={styles.forgot}>Register now</Text>

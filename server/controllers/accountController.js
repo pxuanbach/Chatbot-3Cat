@@ -11,7 +11,7 @@ const createJWT = id => {
 }
 
 const alertError = (err) => {
-    let errors = { username: '', password: '', name: '', email: '' }
+    let errors = { username: '', password: '', name: '', email: '', phone: '' }
     if (err.message === 'incorrect username') {
         errors.username = 'This username not found';
         return errors;
@@ -22,11 +22,13 @@ const alertError = (err) => {
     }
     if (err.code === 11000) {
         if (err.message.includes('username')) {
-            errors.username = 'This user already registered'
+            errors.username = 'Username already registered'
         }
-
         if (err.message.includes('email')) {
-            errors.email = 'This email already registered';
+            errors.email = 'Email already registered';
+        }
+        if (err.message.includes('phone')) {
+            errors.phone = 'Phone number already registered';
         }
         return errors;
     }
