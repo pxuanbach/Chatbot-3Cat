@@ -1,51 +1,141 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { View, SafeAreaView, StyleSheet, TextInput, Text, TouchableOpacity } from 'react-native';
 import { Avatar } from 'react-native-elements';
-import { launchImageLibrary } from 'react-native-image-picker'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import * as ImagePicker from 'expo-image-picker';
+import axiosInstance from '../../../AxiosInstance'
 
 const Personal = () => {
 
-  const [photo, setPhoto] = React.useState('https://haycafe.vn/wp-content/uploads/2021/11/Anh-avatar-dep-chat-lam-hinh-dai-dien.jpg');
+  const [photo, setPhoto] = React.useState('https://i1-giaitri.vnecdn.net/2022/04/28/Avatar-2-James-Cameron-5081-1651112580.jpg?w=1020&h=0&q=100&dpr=1&fit=crop&s=aYcWeARCH8Qs2Ideel6lgA');
 
-  const handleChoosePhoto = () => {
-    launchImageLibrary({ noData: true }, (response) => {
+  const [errorName, setErrorname] = React.useState("");
+  const [errorCareer, setErrorCareer] = React.useState("");
+  const [errorEmail, setErrorEmail] = React.useState("");
+  const [errorPhone, setErrorPhone] = React.useState("");
 
-      if (response) {
-        setPhoto(response);
-      }
+  const handleChoosePhoto = async () => {
+    // No permissions request is necessary for launching the image library
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
     });
+
+    console.log(result);
+
+    if (!result.cancelled) {
+      setPhoto(result.uri);
+    }
   };
 
-  const buttonClickedHandler = () => {
-    //do something
+  const getInfoUser = () => {
+    axiosInstance.get(`/getuser/${username}`)
+      .then(response => {
+        setUser(response.data);
+        onChangeName(response.data.name);
+        onChangeCareer(response.data.career);
+        onChangeEmail(response.data.email);
+        onChangeNumber(response.data.phone);
+      }
+      )
+      .catch(err => {
+        console.log(err);
+      })
   }
 
-  const [name, onChangeName] = React.useState(null);
-  const [career, onChangeCareer] = React.useState(null);
-  const [email, onChangeEmail] = React.useState(null);
-  const [number, onChangeNumber] = React.useState(null);
+  const handleValidate = () => {
+    setErrorname("");
+    setErrorEmail("");
+    setErrorPhone("");
+
+    if (name.length == 0) {
+      setErrorname("Name must be filled!");
+      return false;
+    }
+    if (email.length == 0) {
+      setErrorEmail("Email must be filled!");
+      return false;
+    }
+    if (number.length == 0) {
+      setErrorPhone("Number phone must be filled!");
+      return false;
+    }
+
+    axiosInstance.get(`/checkEmail/${email}`)
+      .then(response => {
+        if (response.data.email == email && response.data.username != user.username) {
+          setErrorEmail("Email already exists!");
+          return false;
+        }
+      })
+      .catch(error => {
+        console.log('1');
+      })
+
+      axiosInstance.get(`/checkPhone/${number}`)
+      .then(response => {
+        if (response.data.phone == number && response.data.username != user.username) {
+          setErrorPhone("Number phone already exists!");
+          return false;
+        }
+      })
+      .catch(error => {
+        console.log('2');
+      })
+    return true;
+  }
+
+  const buttonClickedHandler = () => {
+    if (handleValidate()) {
+      user.email = email;
+      user.name = name;
+      user.phone = number;
+      user.career = career;
+      axiosInstance.put(`/updateUser`, user)
+        .then(response => {
+          console.log(user);
+        }
+        )
+        .catch(err => {
+          console.log(err);
+        })
+    }
+  }
+
+  const [name, onChangeName] = React.useState('');
+  const [career, onChangeCareer] = React.useState('');
+  const [email, onChangeEmail] = React.useState('');
+  const [number, onChangeNumber] = React.useState('');
+  const [username, setUsername] = React.useState("vutan");
+  const [user, setUser] = React.useState(null);
+
+  useEffect(() => {
+    getInfoUser();
+  }, [])
 
   return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'space-evenly', backgroundColor: '#FFFFFF' }}>
-      {photo && (
-        <>
-          <Avatar
-            avatarStyle={{ borderWidth: 3, overflow: "hidden", borderColor: 'lightblue', borderRadius: 100 }}
-            rounded
-            padding = '5'
-            size={150}
-            source={{
-              uri:
-                photo.uri,
-            }}
-            onPress={handleChoosePhoto}
-          >
-          </Avatar>
-        </>
-      )
-      }
-      <View>
-        <SafeAreaView>
+    <KeyboardAwareScrollView style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'space-evenly', backgroundColor: '#FFFFFF', marginTop: 20 }}>
+        {photo && (
+          <>
+            <Avatar
+              avatarStyle={{ borderWidth: 3, overflow: "hidden", borderColor: 'lightblue', borderRadius: 100 }}
+              rounded
+              padding='5'
+              size={150}
+              source={{
+                uri:
+                  photo.uri,
+              }}
+              onPress={handleChoosePhoto}
+            >
+            </Avatar>
+          </>
+        )
+        }
+        <View>
           <Text style={styles.title}>Name</Text>
           <TextInput
             style={styles.input}
@@ -54,6 +144,7 @@ const Personal = () => {
             placeholder="Name"
             keyboardType="default"
           />
+          <Text style={styles.error}>{errorName}</Text>
           <Text style={styles.title}>Career</Text>
           <TextInput
             style={styles.input}
@@ -62,6 +153,7 @@ const Personal = () => {
             placeholder="Career"
             keyboardType="default"
           />
+          <Text style={styles.error}></Text>
           <Text style={styles.title}>Email</Text>
           <TextInput
             style={styles.input}
@@ -70,6 +162,7 @@ const Personal = () => {
             placeholder="Email"
             keyboardType="email-address"
           />
+          <Text style={styles.error}>{errorEmail}</Text>
           <Text style={styles.title}>Phone Number</Text>
           <TextInput
             style={styles.input}
@@ -78,17 +171,18 @@ const Personal = () => {
             placeholder="Phone number"
             keyboardType="numeric"
           />
-        </SafeAreaView>
-      </View>
-      <View style={[{ width: "50%", margin: 0 }]}>
-        <TouchableOpacity
-          onPress={buttonClickedHandler}
-          style={styles.roundButton}>
-          <Text style={styles.titleButton}>SAVE</Text>
-        </TouchableOpacity>
+          <Text style={styles.error}>{errorPhone}</Text>
+        </View>
+        <View style={[{ width: "50%", margin: 0, flex: 1, marginBottom: 10, marginTop: 10 }]}>
+          <TouchableOpacity
+            onPress={buttonClickedHandler}
+            style={styles.roundButton}>
+            <Text style={styles.titleButton}>SAVE</Text>
+          </TouchableOpacity>
 
+        </View>
       </View>
-    </View>
+    </KeyboardAwareScrollView>
 
   )
 }
@@ -96,7 +190,7 @@ const styles = StyleSheet.create({
   input: {
     width: 300,
     height: 40,
-    marginVertical: 10,
+    marginVertical: 5,
     borderWidth: 1,
     paddingHorizontal: 15,
     paddingVertical: 10,
@@ -107,6 +201,12 @@ const styles = StyleSheet.create({
   },
   title: {
     color: '#80818B'
+  },
+  error: {
+    color: 'red',
+    fontSize: 12,
+    marginVertical: 2,
+    marginLeft: 10
   },
   titleButton: {
     color: 'white',
