@@ -7,10 +7,10 @@ const ChatItem = ({ message }) => {
   const styles = StyleSheet.create({
     container: {
       padding: 10,
-      alignItems: message.isMine ? 'flex-end' : 'flex-start',
+      alignItems: message.sender !== 'bot' ? 'flex-end' : 'flex-start',
     },
     chatBox: {
-      backgroundColor: message.isMine ? '#F8BBF2' : '#BBE2F8',
+      backgroundColor: message.sender !== 'bot' ? '#F8BBF2' : '#BBE2F8',
       borderRadius: 10,
       padding: 10,
       maxWidth: 300,

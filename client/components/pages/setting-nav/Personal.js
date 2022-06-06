@@ -1,9 +1,10 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useContext } from 'react'
 import { View, SafeAreaView, StyleSheet, TextInput, Text, TouchableOpacity } from 'react-native';
 import { Avatar } from 'react-native-elements';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import * as ImagePicker from 'expo-image-picker';
 import axiosInstance from '../../../AxiosInstance'
+import { UserContext } from '../../../UserContext';
 
 const Personal = () => {
 
@@ -96,6 +97,7 @@ const Personal = () => {
       axiosInstance.put(`/updateUser`, user)
         .then(response => {
           console.log(user);
+
         }
         )
         .catch(err => {
