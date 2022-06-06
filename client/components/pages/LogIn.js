@@ -1,12 +1,38 @@
-import React from 'react'
-import { StyleSheet, View, Text, Pressable, TextInput, TouchableOpacity } from 'react-native';
+import React, { useState, useContext } from 'react'
+import {
+  StyleSheet, View, Text, Pressable,
+  TextInput, TouchableOpacity
+} from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import LinearGradientBackground from '../reusable/LinearGradientBackground';
+import axiosInstance from '../../AxiosInstance';
+import { UserContext } from '../../UserContext';
 
 const LogIn = ({ navigation }) => {
+  const {user, setUser} = useContext(UserContext);
+  const [username, onChangeUsername] = useState('');
+  const [password, onChangePassword] = useState('');
 
-  const [username, onChangeUsername] = React.useState('');
-  const [password, onChangePassword] = React.useState('');
+  const handleLogin = async () => {
+    console.log(username, password)
+    axiosInstance.post('/login',
+      JSON.stringify({
+        "username": username,
+        "password": password
+      }), {
+      headers: { "Content-Type": "application/json" }
+    }).then(async (response) => {
+      //response.data
+      //console.log("data", response.data.token)
+      setUser(response.data.user);
+      await AsyncStorage.setItem('@storage_token', response.data.token)
+    }).catch(err => {
+      //err.response.data
+      console.log("error", err.response)
+    })
+    //navigation.navigate('Home');
+  }
 
   return (
     <KeyboardAwareScrollView style={{ flex: 1, backgroundColor: '#FFFFFF'}}>
@@ -28,7 +54,7 @@ const LogIn = ({ navigation }) => {
           </View>
         </View>
         <View style={styles.btnContainer}>
-          <Pressable style={styles.btn} onPress={() => navigation.navigate('Home')}>
+          <Pressable style={styles.btn} onPress={handleLogin}>
             <Text style={styles.btnContent}>LOGIN</Text>
           </Pressable>
           <View style={styles.register}>
