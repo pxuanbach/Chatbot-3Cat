@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#2A2C5B',
     fontFamily: 'Roboto',
-    marginTop: '20%'
+    marginTop: '10%'
   },
   subtitleText: {
     fontSize: 16,

@@ -3,9 +3,7 @@ const User = require('../models/User');
 
 const allMessage = async(req, res) => {
     try {
-        const message = await Message.find({ user: req.params.userId})
-                                .populate("sender", "name pic email")
-                                .populate("chat");
+        const message = await Message.find({ user: req.params.userId});
         
         res.json(message);
     } catch (error) {
