@@ -2,7 +2,6 @@ require('dotenv').config()
 const express = require('express');
 const cors = require('cors');
 const connectDB = require('./config/config');
-const chatRoutes = require('./routes/ChatRouter');
 const messageRoutes = require('./routes/MessageRoutes');
 const authRoutes = require('./routes/authRoutes')
 const accountRoute = require('./routes/accountRoute');
@@ -19,7 +18,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(authRoutes);
 app.use(accountRoute);
 
-app.use("/chat", chatRoutes);
 app.use("/message", messageRoutes);
 
 const PORT = process.env.PORT || 5000;

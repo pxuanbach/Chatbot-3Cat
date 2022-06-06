@@ -11,7 +11,7 @@ const router = express.Router();
 
 // router.route("/:chatId").get(protect, allMessage);
 // router.route("/").post(protect, sendMessage);
-router.route("/:chatId").get(allMessage);
+router.route("/:userId").get(allMessage);
 router.route("/").post(sendMessage);
 
 
