@@ -1,5 +1,6 @@
 import React from 'react'
 import { StyleSheet, View, Text, Pressable, TextInput, TouchableOpacity } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import LinearGradientBackground from '../reusable/LinearGradientBackground';
 
 const SignUp = ({navigation}) => {
@@ -10,6 +11,8 @@ const SignUp = ({navigation}) => {
   const [phoneNumber, onChangePhoneNumber] = React.useState('');
 
   return (
+    <KeyboardAwareScrollView style={{ flex: 1, backgroundColor: '#FFFFFF'}}>
+
     <View style={{flex: 1, backgroundColor: 'rgba(255, 255, 255, 0.78)'}}>
       <LinearGradientBackground></LinearGradientBackground>
       <View style={styles.container}>
@@ -37,30 +40,31 @@ const SignUp = ({navigation}) => {
         </View>
       </View>
     </View>
+    </KeyboardAwareScrollView>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flex: 2,
     alignItems: 'center',
   },
   formContainer: {
-    flex: 2,
+    flex: 3,
     alignItems: 'center',
-    marginTop: 100
+    marginTop: '10%'
   },
   btnContainer: {
     flex: 1,
     alignItems: 'center',
-    marginTop: 60
+    justifyContent: 'center',
   },
   titleText: {
     fontSize: 32,
     fontWeight: '700',
     color: '#2A2C5B',
     fontFamily: 'Roboto',
-    marginTop: 85
+    marginTop: '20%'
   },
   subtitleText: {
     fontSize: 16,
@@ -76,7 +80,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#6384DA',
     padding: 20,
-    marginBottom: 20,
+    marginBottom: '5%',
     backgroundColor: '#fff'
   },
   touch: {
@@ -91,7 +95,7 @@ const styles = StyleSheet.create({
     height: 60,
     backgroundColor: '#6384DA',
     borderRadius: 15,
-    marginBottom: 40
+    marginBottom: '5%'
   },
   btnContent: {
     fontFamily: 'Roboto',
@@ -106,7 +110,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     fontSize: 16,
-    marginTop: 5
+    marginTop: 0
   }
 })
 
