@@ -10,7 +10,7 @@ import axiosInstance from '../../AxiosInstance';
 import { UserContext } from '../../UserContext';
 
 const LogIn = ({ navigation }) => {
-  const {user, setUser} = useContext(UserContext);
+  const { user, setUser } = useContext(UserContext);
   const [username, onChangeUsername] = useState('');
   const [password, onChangePassword] = useState('');
 
@@ -35,17 +35,30 @@ const LogIn = ({ navigation }) => {
   }
 
   return (
-    <KeyboardAwareScrollView style={{ flex: 1, backgroundColor: '#FFFFFF'}}>
-      <View style={{flex: 1, backgroundColor: 'rgba(255, 255, 255, 1)'}}>
+    <KeyboardAwareScrollView style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
+      <View style={{ flex: 1, backgroundColor: 'rgba(255, 255, 255, 1)' }}>
         <LinearGradientBackground></LinearGradientBackground>
         <View style={styles.container}>
           <Text style={styles.titleText}>Hello again!</Text>
           <Text>{"\n"}</Text>
-          <Text style={styles.subtitleText}>Welcome to 3Cat. Please enter your username and password to access with your personal account</Text>
+          <Text style={styles.subtitleText}>
+            Welcome to 3Cat. Please enter your username and
+            password to access with your personal account
+          </Text>
         </View>
         <View style={styles.formContainer} >
-          <TextInput style={styles.input} onChangeText={onChangeUsername} value={username} placeholder='Enter username'/>
-          <TextInput style={styles.input} onChangeText={onChangePassword} value={password} placeholder='Enter password' secureTextEntry={true}/>
+          <TextInput
+            style={styles.input}
+            onChangeText={onChangeUsername}
+            value={username}
+            placeholder='Enter username'
+          />
+          <TextInput
+            style={styles.input}
+            onChangeText={onChangePassword}
+            value={password}
+            placeholder='Enter password'
+            secureTextEntry={true} />
           <View style={styles.forgotPassword}>
             <TouchableOpacity
               onPress={() => navigation.navigate('Forget Password')}>
@@ -58,7 +71,7 @@ const LogIn = ({ navigation }) => {
             <Text style={styles.btnContent}>LOGIN</Text>
           </Pressable>
           <View style={styles.register}>
-            <Text style={{fontSize: 16}}>Not a member? </Text>
+            <Text style={{ fontSize: 16 }}>Not a member? </Text>
             <TouchableOpacity
               onPress={() => navigation.navigate('Sign Up')}>
               <Text style={styles.forgot}>Register now</Text>

@@ -1,45 +1,77 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { StyleSheet, View, Text, Pressable, TextInput, TouchableOpacity } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import LinearGradientBackground from '../reusable/LinearGradientBackground';
 
-const SignUp = ({navigation}) => {
-  const [username, onChangeUsername] = React.useState('');
-  const [password, onChangePassword] = React.useState('');
-  const [rePassword, onChangeRePassword] = React.useState('');
-  const [email, onChangeEmail] = React.useState('');
-  const [phoneNumber, onChangePhoneNumber] = React.useState('');
+const SignUp = ({ navigation }) => {
+  const [username, onChangeUsername] = useState('');
+  const [usernameErr, onChangeUsernameErr] = useState('');
+  const [password, onChangePassword] = useState('');
+  const [passwordErr, onChangePasswordErr] = useState('');
+  const [rePassword, onChangeRePassword] = useState('');
+  const [rePasswordErr, onChangeRePasswordErr] = useState('');
+  const [email, onChangeEmail] = useState('');
+  const [emailErr, onChangeEmailErr] = useState('');
+  const [phoneNumber, onChangePhoneNumber] = useState('');
+  const [phoneNumberErr, onChangePhoneNumberErr] = useState('');
 
   return (
-    <KeyboardAwareScrollView style={{ flex: 1, backgroundColor: '#FFFFFF'}}>
+    <KeyboardAwareScrollView style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
 
-    <View style={{flex: 1, backgroundColor: 'rgba(255, 255, 255, 0.78)'}}>
-      <LinearGradientBackground></LinearGradientBackground>
-      <View style={styles.container}>
-        <Text style={styles.titleText}>Hello again!</Text>
-        <Text>{"\n"}</Text>
-        <Text style={styles.subtitleText}>Welcome to 3Cat. Please enter your username and password to access with your personal account</Text>
-      </View>
-      <View style={styles.formContainer} >
-        <TextInput style={styles.input} onChangeText={onChangeUsername} value={username} placeholder='Username'/>
-        <TextInput style={styles.input} onChangeText={onChangePassword} value={password} placeholder='Password' secureTextEntry={true}/>
-        <TextInput style={styles.input} onChangeText={onChangeRePassword} value={rePassword} placeholder='RePassword' secureTextEntry={true}/>
-        <TextInput style={styles.input} onChangeText={onChangeEmail} value={email} placeholder='Email'/>
-        <TextInput style={styles.input} onChangeText={onChangePhoneNumber} value={phoneNumber} placeholder='Phone Number'/>
-      </View>
-      <View style={styles.btnContainer}>
-        <Pressable style={styles.btn} onPress={() => navigation.navigate('Log In')}>
-          <Text style={styles.btnContent}>Sign Up</Text>
-        </Pressable>
-        <View style={styles.login}>
-          <Text style={{fontSize: 16}}>I'm already a member! </Text>
-          <TouchableOpacity
-            onPress={() => navigation.navigate('Log In')}>
-            <Text style={styles.touch}>Login</Text>
-          </TouchableOpacity>
+      <View style={{ flex: 1, backgroundColor: 'rgba(255, 255, 255, 0.78)' }}>
+        <LinearGradientBackground></LinearGradientBackground>
+        <View style={styles.container}>
+          <Text style={styles.titleText}>Hello again!</Text>
+          <Text>{"\n"}</Text>
+          <Text style={styles.subtitleText}>Welcome to 3Cat. Please enter your username and password to access with your personal account</Text>
+        </View>
+        <View style={styles.formContainer} >
+          <TextInput
+            style={styles.input}
+            onChangeText={onChangeUsername}
+            value={username}
+            placeholder='Username'
+          />
+          <TextInput
+            style={styles.input}
+            onChangeText={onChangePassword}
+            value={password}
+            placeholder='Password'
+            secureTextEntry={true}
+          />
+          <TextInput
+            style={styles.input}
+            onChangeText={onChangeRePassword}
+            value={rePassword}
+            placeholder='RePassword'
+            secureTextEntry={true}
+          />
+          <TextInput
+            style={styles.input}
+            onChangeText={onChangeEmail}
+            value={email}
+            placeholder='Email'
+          />
+          <TextInput
+            style={styles.input}
+            onChangeText={onChangePhoneNumber}
+            value={phoneNumber}
+            placeholder='Phone Number'
+          />
+        </View>
+        <View style={styles.btnContainer}>
+          <Pressable style={styles.btn} onPress={() => navigation.navigate('Log In')}>
+            <Text style={styles.btnContent}>Sign Up</Text>
+          </Pressable>
+          <View style={styles.login}>
+            <Text style={{ fontSize: 16 }}>I'm already a member! </Text>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('Log In')}>
+              <Text style={styles.touch}>Login</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
-    </View>
     </KeyboardAwareScrollView>
   )
 }
