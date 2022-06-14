@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { StyleSheet, View, Text, Pressable, TextInput, TouchableOpacity } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import LinearGradientBackground from '../reusable/LinearGradientBackground';
+import axiosInstance from '../../AxiosInstance';
 
 const SignUp = ({ navigation }) => {
   const [username, onChangeUsername] = useState('');
@@ -15,14 +16,55 @@ const SignUp = ({ navigation }) => {
   const [phoneNumber, onChangePhoneNumber] = useState('');
   const [phoneNumberErr, onChangePhoneNumberErr] = useState('');
 
+  const resetStateErr = () => {
+    onChangeUsernameErr('')
+    onChangePasswordErr('')
+    onChangeRePasswordErr('')
+    onChangeEmailErr('')
+    onChangePhoneNumberErr('')
+  }
+
+  const isRePasswordMatch = () => {
+    if (rePassword !== password) {
+      onChangeRePasswordErr("RePassword doesn't match password")
+      return false;
+    }
+    return true;
+  }
+
+  const handleSignUp = async () => {
+    resetStateErr();
+    if (isRePasswordMatch()) {
+      axiosInstance.post('/signup',
+        JSON.stringify({
+          "username": username,
+          "password": password,
+          "email": email,
+          "phone": phoneNumber
+        }), {
+        headers: { "Content-Type": "application/json" }
+      }).then((response) => {
+        //response.data
+        navigation.navigate("Log In");
+      }).catch(err => {
+        //err.response.data
+        const errors = err.response.data.errors
+        if (errors) {
+          onChangeUsernameErr(errors.username)
+          onChangePasswordErr(errors.password)
+          onChangeEmailErr(errors.email)
+          onChangePhoneNumberErr(errors.phone)
+        }
+      })
+    }
+  }
+
   return (
     <KeyboardAwareScrollView style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
-
       <View style={{ flex: 1, backgroundColor: 'rgba(255, 255, 255, 0.78)' }}>
         <LinearGradientBackground></LinearGradientBackground>
         <View style={styles.container}>
           <Text style={styles.titleText}>Hello again!</Text>
-          <Text>{"\n"}</Text>
           <Text style={styles.subtitleText}>Welcome to 3Cat. Please enter your username and password to access with your personal account</Text>
         </View>
         <View style={styles.formContainer} >
@@ -32,6 +74,11 @@ const SignUp = ({ navigation }) => {
             value={username}
             placeholder='Username'
           />
+          <View style={styles.errorContainer}>
+            {usernameErr ?
+              <Text style={styles.errorText}>{usernameErr}</Text>
+              : <></>}
+          </View>
           <TextInput
             style={styles.input}
             onChangeText={onChangePassword}
@@ -39,6 +86,11 @@ const SignUp = ({ navigation }) => {
             placeholder='Password'
             secureTextEntry={true}
           />
+          <View style={styles.errorContainer}>
+            {passwordErr ?
+              <Text style={styles.errorText}>{passwordErr}</Text>
+              : <></>}
+          </View>
           <TextInput
             style={styles.input}
             onChangeText={onChangeRePassword}
@@ -46,21 +98,36 @@ const SignUp = ({ navigation }) => {
             placeholder='RePassword'
             secureTextEntry={true}
           />
+          <View style={styles.errorContainer}>
+            {rePasswordErr ?
+              <Text style={styles.errorText}>{rePasswordErr}</Text>
+              : <></>}
+          </View>
           <TextInput
             style={styles.input}
             onChangeText={onChangeEmail}
             value={email}
             placeholder='Email'
           />
+          <View style={styles.errorContainer}>
+            {emailErr ?
+              <Text style={styles.errorText}>{emailErr}</Text>
+              : <></>}
+          </View>
           <TextInput
             style={styles.input}
             onChangeText={onChangePhoneNumber}
             value={phoneNumber}
             placeholder='Phone Number'
           />
+          <View style={styles.errorContainer}>
+            {phoneNumberErr ?
+              <Text style={styles.errorText}>{phoneNumberErr}</Text>
+              : <></>}
+          </View>
         </View>
         <View style={styles.btnContainer}>
-          <Pressable style={styles.btn} onPress={() => navigation.navigate('Log In')}>
+          <Pressable style={styles.btn} onPress={handleSignUp}>
             <Text style={styles.btnContent}>Sign Up</Text>
           </Pressable>
           <View style={styles.login}>
@@ -106,13 +173,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   input: {
+    fontSize: 15,
     width: 320,
-    height: 60,
     borderRadius: 10,
     borderWidth: 1,
     borderColor: '#6384DA',
-    padding: 20,
-    marginBottom: '5%',
+    padding: 15,
     backgroundColor: '#fff'
   },
   touch: {
@@ -143,6 +209,13 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     fontSize: 16,
     marginTop: 0
+  },
+  errorContainer: {
+    marginBottom: 20
+  },
+  errorText: {
+    color: 'red',
+    marginTop: 2,
   }
 })
 

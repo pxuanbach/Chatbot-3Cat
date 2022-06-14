@@ -19,7 +19,7 @@ const userSchema = new mongoose.Schema({
     name: String,
     email: {
         type: String,
-        required: [true, 'Please enter a email'],
+        required: [true, 'Please enter an email'],
         unique: [true, 'Dupplicate'],
         lowercase: true,
         validate: [isEmail, 'Please enter a valid email address']
@@ -27,6 +27,7 @@ const userSchema = new mongoose.Schema({
     phone: {
         type: String,
         unique: [true, 'Dupplicate'],
+        required: [true, 'Please enter a phone number'],
     },
     career: String,
 })

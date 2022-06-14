@@ -12,10 +12,17 @@ import { UserContext } from '../../UserContext';
 const LogIn = ({ navigation }) => {
   const { user, setUser } = useContext(UserContext);
   const [username, onChangeUsername] = useState('');
+  const [usernameErr, onChangeUsernameErr] = useState('');
   const [password, onChangePassword] = useState('');
+  const [passwordErr, onChangePasswordErr] = useState('');
+
+  const resetStateErr = () => {
+    onChangeUsernameErr('')
+    onChangePasswordErr('')
+  }
 
   const handleLogin = async () => {
-    console.log(username, password)
+    resetStateErr();
     axiosInstance.post('/login',
       JSON.stringify({
         "username": username,
@@ -24,14 +31,16 @@ const LogIn = ({ navigation }) => {
       headers: { "Content-Type": "application/json" }
     }).then(async (response) => {
       //response.data
-      //console.log("data", response.data.token)
       setUser(response.data.user);
       await AsyncStorage.setItem('@storage_token', response.data.token)
     }).catch(err => {
       //err.response.data
-      console.log("error", err.response)
+      const errors = err.response.data.errors
+      if (errors) {
+        onChangeUsernameErr(errors.username)
+        onChangePasswordErr(errors.password)
+      }
     })
-    //navigation.navigate('Home');
   }
 
   return (
@@ -53,12 +62,22 @@ const LogIn = ({ navigation }) => {
             value={username}
             placeholder='Enter username'
           />
+          <View style={styles.errorContainer}>
+            {usernameErr ?
+              <Text style={styles.errorText}>{usernameErr}</Text>
+              : <></>}
+          </View>
           <TextInput
             style={styles.input}
             onChangeText={onChangePassword}
             value={password}
             placeholder='Enter password'
             secureTextEntry={true} />
+          <View style={styles.errorContainer}>
+            {passwordErr ?
+              <Text style={styles.errorText}>{passwordErr}</Text>
+              : <></>}
+          </View>
           <View style={styles.forgotPassword}>
             <TouchableOpacity
               onPress={() => navigation.navigate('Forget Password')}>
@@ -113,13 +132,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   input: {
+    fontSize: 15,
     width: 320,
-    height: 60,
     borderRadius: 10,
     borderWidth: 1,
     borderColor: '#6384DA',
-    padding: 20,
-    marginBottom: '5%',
+    padding: 15,
     backgroundColor: '#fff'
   },
   forgotPassword: {
@@ -155,6 +173,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     fontSize: 16
+  },
+  errorContainer: {
+    marginBottom: 20
+  },
+  errorText: {
+    color: 'red',
+    marginTop: 2,
   }
 })
 

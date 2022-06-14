@@ -16,7 +16,7 @@ const Account = ({ navigation }) => {
       await AsyncStorage.removeItem('@storage_token');
       setUser(null)
     } catch(error) {
-      console.log(error)
+      console.log("logout", error)
     }
   }
 
