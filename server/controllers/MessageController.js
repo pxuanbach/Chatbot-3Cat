@@ -1,6 +1,7 @@
 const Message = require('../models/Message');
 const User = require('../models/User');
-const witClient = require('../middleware/Wit')
+const witClient = require('../config/Wit')
+const nlp = require('../middleware/NLP')
 
 const allMessage = async (req, res) => {
     try {
@@ -30,15 +31,38 @@ const sendMessage = async (req, res) => {
         };
         var message = await Message.create(newMessage);
 
-        witClient.message(content)
-        .then(data => {
-            console.log('Intent name: ' + data.intents[0].name);
-            res.status(200).send(message)
-        }).catch(console.error);
+        var witRes = await witClient.message(content)
+        console.log('wit response: ' + JSON.stringify(witRes));
+        var reply = await nlp.handleMessage(witRes)
+
+        var newBotMessage = {
+            sender: 'bot',
+            content: reply,
+            user: userId
+        }
+        var botMessage = await Message.create(newBotMessage);
+
+        res.status(200).send({
+            message,
+            botMessage
+        })
     } catch (error) {
         console.log('This is ERROR', error.message)
         res.status(400).json({ error: error.message });
     }
 }
 
-module.exports = { allMessage, sendMessage }
+const clearAllMessage = (req, res) => {
+    try {
+        const userId = req.params.userId
+        Message.deleteMany({ user: userId })
+        .then(() => {
+            res.status(200).send({success: true});
+        })
+    } catch (error) {
+        console.log('This is ERROR', error.message)
+        res.status(400).json({ error, success: false })
+    }
+}
+
+module.exports = { allMessage, sendMessage, clearAllMessage }

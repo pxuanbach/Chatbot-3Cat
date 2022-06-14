@@ -23,8 +23,16 @@ const InputBox = ({ user, setMessages }) => {
         }), {
         headers: { "Content-Type": "application/json" }
       }).then(response => {
-        setMessages(preMessages => [...preMessages, response.data])
-        setMessage('')
+        if (response.data.message) {
+          setMessages(preMessages => [...preMessages, response.data.message])
+          setMessage('')
+        }
+        setTimeout(() => {
+          if (response.data.botMessage) {
+            setMessages(preMessages => [...preMessages, response.data.botMessage])
+          }
+        }, 300)
+        
       }).catch(err => {
         console.log("Send message err", err.response.data.error)
       }) 
