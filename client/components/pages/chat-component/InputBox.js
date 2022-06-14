@@ -5,8 +5,9 @@ import {
 } from 'react-native';
 import { Octicons } from '@expo/vector-icons';
 import { SimpleLineIcons } from '@expo/vector-icons';
+import axiosInstance from '../../../AxiosInstance';
 
-const InputBox = () => {
+const InputBox = ({ user, setMessages }) => {
   const [message, setMessage] = useState('');
 
   const handleSpeechToText = () => {
@@ -15,7 +16,18 @@ const InputBox = () => {
 
   const handleSendMessage = () => {
     if (message) {
-      console.log(message)
+      axiosInstance.post('/message',
+        JSON.stringify({
+          "content": message,
+          "userId": user._id
+        }), {
+        headers: { "Content-Type": "application/json" }
+      }).then(response => {
+        setMessages(preMessages => [...preMessages, response.data])
+        setMessage('')
+      }).catch(err => {
+        console.log("Send message err", err.response.data.error)
+      }) 
     }
   }
 
@@ -27,23 +39,23 @@ const InputBox = () => {
     >
       <View style={styles.container}>
         <View style={styles.mainContainer}>
-        <TouchableOpacity onPress={handleSpeechToText}>
-          <View style={styles.buttonContainer}>
-          <SimpleLineIcons name="microphone" size={24} color="#7046E7" />
-          </View>
-        </TouchableOpacity>
-        <TextInput
-          placeholder={"Type a message"}
-          style={styles.textInput}
-          multiline
-          value={message}
-          onChangeText={setMessage}
-        />
-        <TouchableOpacity onPress={handleSendMessage}>
-          <View style={styles.buttonContainer}>
-            <Octicons name="paper-airplane" size={24} color="#7046E7" />
-          </View>
-        </TouchableOpacity>
+          <TouchableOpacity onPress={handleSpeechToText}>
+            <View style={styles.buttonContainer}>
+              <SimpleLineIcons name="microphone" size={24} color="#7046E7" />
+            </View>
+          </TouchableOpacity>
+          <TextInput
+            placeholder={"Type a message"}
+            style={styles.textInput}
+            multiline
+            value={message}
+            onChangeText={setMessage}
+          />
+          <TouchableOpacity onPress={handleSendMessage}>
+            <View style={styles.buttonContainer}>
+              <Octicons name="paper-airplane" size={24} color="#7046E7" />
+            </View>
+          </TouchableOpacity>
         </View>
       </View>
     </KeyboardAvoidingView>

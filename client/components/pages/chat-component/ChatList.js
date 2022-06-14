@@ -8,9 +8,11 @@ const ChatList = ({ messages }) => {
     let messagesEndRef = useRef(null)
 
     useEffect(() => {
+
         setTimeout(() => {
             messagesEndRef.scrollToEnd({ animated: true })
-        }, messages.length * 30)
+        }, messages.length * 50)
+
     }, [])
 
     return (
