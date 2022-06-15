@@ -31,7 +31,7 @@ const InputBox = ({ user, setMessages }) => {
           if (response.data.botMessage) {
             setMessages(preMessages => [...preMessages, response.data.botMessage])
           }
-        }, 300)
+        }, 500)
         
       }).catch(err => {
         console.log("Send message err", err.response.data.error)

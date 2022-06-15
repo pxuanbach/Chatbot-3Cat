@@ -1,13 +1,33 @@
+const getWeather = require('./GetWeather')
+
 const staticResponses = {
     hello: [
         "Hey, chào bạn!",
         "Hi",
         "Rất vui được gặp bạn",
         "Xin chào",
+        "Hello"
     ],
+    praise: [
+        "Cảm ơn về lời khen! :)",
+        "Rất vui khi trò chuyện với bạn",
+        "Hihi",
+        "Đa tạ!"
+    ],
+    botinfo: [
+        "Mình là chatbot do nhóm 3Cat tạo ra",
+        "1 chatbot nhỏ bé giữa thế giới rộng lớn...",
+        "Nếu bạn đã thành tâm muốn biết... Mình là chatbot được tạo ra bởi nhóm 3Cat",
+    ]
 };
 
 let prevIntentName = ''
+
+const replyInResponses = (intentName) => {
+    const replyArr = staticResponses[intentName];
+    const reply = replyArr[Math.floor(Math.random() * replyArr.length)];
+    return reply;
+}
 
 const getEntityValue = (entities, key) => {
     const entity = entities[key];
@@ -18,17 +38,21 @@ const getEntityValue = (entities, key) => {
     return null;
 }
 
-const processPrevIntent = (entity) => {
+const processPrevIntent = async (entity) => {
     let reply = ''
     switch (prevIntentName) {
         case "weather":
-            reply = "Thời tiết ở " + entity;
+            await getWeather(entity).then(result => {
+                console.log(result)
+                reply = `Thời tiết ở ${result.name} đang ${result.desc}, nhiệt độ khoảng ${result.temp.toFixed(2)} độ C, độ ẩm khoảng ${result.humidity}%`
+            }).catch(err => {
+                reply = "Mình không tìm thấy nơi bạn cần xem thời tiết";
+            })
             break;
         default:
             reply = "Xin chào, " + entity;
             break;
     }
-    prevIntentName = '';
     return reply;
 }
 
@@ -39,10 +63,21 @@ var nlp = {
         console.log('intentName ', intentName)
         let reply = ''
         switch (intentName) {
-            case "hello":
-                const replyArr = staticResponses[intentName];
-                reply = replyArr[Math.floor(Math.random() * replyArr.length)];
+            case "hello": {
+                reply = replyInResponses(intentName)
+                prevIntentName = '';
                 break;
+            }
+            case "praise": {
+                reply = replyInResponses(intentName)
+                prevIntentName = '';
+                break;
+            }
+            case "botinfo": {
+                reply = replyInResponses(intentName)
+                prevIntentName = '';
+                break;
+            }
             case "weather": {
                 const entityValue = getEntityValue(entities, "name:name")
                 if (entityValue) {
@@ -61,7 +96,7 @@ var nlp = {
                     reply = processPrevIntent(witResponse.text)
                 }
                 break;
-            } 
+            }
             default:
                 reply = "Xin lỗi, mình cần học nhiều hơn"
                 break;
