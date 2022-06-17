@@ -20,6 +20,7 @@ const ChatItem = ({ message }) => {
       fontSize: 18,
       fontWeight: '400',
       color: '#19377A',
+      lineHeight: 26,
     },
     time: {
       color: '#AFAFAF',

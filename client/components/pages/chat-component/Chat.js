@@ -1,83 +1,53 @@
-import React from 'react'
-import { View, StyleSheet } from 'react-native';
+import React, { useState, useEffect, useContext } from 'react'
+import {
+  View, StyleSheet, Text, Image,
+  TouchableOpacity, KeyboardAvoidingView
+} from 'react-native';
 import ChatList from './ChatList';
 import InputBox from './InputBox';
-
-const data = [
-  {
-    content: 'Xin chào',
-    sender: 'bot',
-    createdAt: '2022-05-20T16:39:06.170+00:00'
-  },
-  {
-    content: 'Định lí Pytago',
-    sender: 'ấudiansdnasdnasd',
-    createdAt: '2022-05-20T17:00:34.183+00:00'
-  },
-  // {
-  //   content: 'Tổng cạnh huyền bằng tổng bình phương 2 cạnh góc vuông',
-  //   isMine: true,
-  //   createdAt: '2022-05-20T17:00:53.144+00:00'
-  // },
-  // {
-  //   content: 'Xin chào',
-  //   isMine: false,
-  //   createdAt: '2022-05-20T17:01:00.879+00:00'
-  // },
-  // {
-  //   content: 'Xin chào',
-  //   isMine: true,
-  //   createdAt: '2022-05-22T04:28:27.618+00:00'
-  // },
-  // {
-  //   content: 'Xin chào',
-  //   isMine: false,
-  //   createdAt: '2022-05-24T11:16:57.380+00:00'
-  // },
-  // {
-  //   content: 'Xin chào',
-  //   isMine: false,
-  //   createdAt: '2022-05-24T11:16:57.380+00:00'
-  // },
-  // {
-  //   content: 'Xin chào',
-  //   isMine: false,
-  //   createdAt: '2022-05-24T11:16:57.380+00:00'
-  // },
-  // {
-  //   content: 'Xin chào',
-  //   isMine: false,
-  //   createdAt: '2022-05-24T11:16:57.380+00:00'
-  // },
-  // {
-  //   content: 'Xin chào',
-  //   isMine: false,
-  //   createdAt: '2022-05-24T11:16:57.380+00:00'
-  // },
-  // {
-  //   content: 'Định lí Pytago',
-  //   isMine: false,
-  //   createdAt: '2022-05-20T17:00:34.183+00:00'
-  // },
-  // {
-  //   content: 'Tổng cạnh huyền bằng tổng bình phương 2 cạnh góc vuông',
-  //   isMine: true,
-  //   createdAt: '2022-05-20T17:00:53.144+00:00'
-  // },
-  // {
-  //   content: 'Tổng cạnh huyền bằng tổng bình phương 2 cạnh góc vuông',
-  //   isMine: true,
-  //   createdAt: '2022-05-20T17:00:53.144+00:00'
-  // },
-]
+import axiosInstance from '../../../AxiosInstance'
+import { UserContext } from '../../../UserContext'
 
 const Chat = ({ navigation }) => {
+  const { user } = useContext(UserContext)
+  const [messages, setMessages] = useState([])
+
+  const handleClearAllMessage = () => {
+    axiosInstance.delete(`/message/${user._id}`)
+      .then(response => {
+        if (response.data.success) {
+          setMessages([])
+        }
+      }).catch(err => {
+        console.log(err.response.data.error)
+      })
+  }
+
+  useEffect(() => {
+    if (user) {
+      axiosInstance.get(`/message/${user._id}`)
+        .then(response => {
+          setMessages(response.data)
+        }).catch(err => {
+          console.log(err.response.data)
+        })
+    }
+  }, [user])
 
   return (
-    <View style={styles.container}>
-        <ChatList messages={data}/>
-        <InputBox/>
-    </View>
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <View style={styles.flexRow}>
+            <Text style={{ fontSize: 20, fontWeight: 'bold' }}>3Cat </Text>
+            <Image source={require('../../../assets/Cat.png')}></Image>
+          </View>
+          <TouchableOpacity onPress={handleClearAllMessage}>
+            <Text style={{ fontSize: 16, color: "#7046E7" }}>CLEAR ALL</Text>
+          </TouchableOpacity>
+        </View>
+        {user ? <ChatList messages={messages} /> : <></>}
+        <InputBox user={user} setMessages={setMessages} />
+      </View>
   )
 }
 
@@ -89,6 +59,22 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     height: '100%'
   },
+  flexRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    justifyContent: 'center',
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    justifyContent: 'space-between',
+    backgroundColor: '#F2F4F8',
+    elevation: 0,
+    shadowOpacity: 0,
+    height: "12%",
+    width: '100%',
+    padding: '4%'
+  }
 })
 
 export default Chat

@@ -14,19 +14,7 @@ const Home = () => {
         name="Chat"
         component={Chat}
         initialParams={{ icon: 'chatbubbles-outline' }}
-        options={{
-          headerTitleAlign: 'center',
-          headerStyle: {
-            backgroundColor: '#F2F4F8',
-            elevation: 0,
-            shadowOpacity: 0
-          },
-          headerTitle: (props) => (
-            <View {...props} style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Text style={{ fontSize: 20, fontWeight: 'bold' }}>3Cat </Text>
-              <Image source={require('../../assets/Cat.png')}></Image>
-            </View>)
-        }}
+        options={{ headerShown: false }}
       />
       <Tab.Screen
         name="Account Stack"
