@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const { model } = require('mongoose');
 const bcrypt = require('bcrypt');
 const maxAge = 5 * 24 * 60 * 60;
+const SALT_WORK_FACTOR = 10
 
 const createJWT = id => {
     return jwt.sign({ id }, 'chatbot secret', {
@@ -55,6 +56,7 @@ module.exports.getUserbyUsername = async (req, res) => {
 }
 
 module.exports.updatePersonal = async (req, res) => {
+    console.log(req.body);
     try {
         const user = await User.findOneAndUpdate({ "username": req.body.username }, {
             "name": req.body.name,
@@ -73,18 +75,21 @@ module.exports.updatePersonal = async (req, res) => {
 }
 
 module.exports.updatePassword = async (req, res) => {
-    try {
-        const user = await User.findOneAndUpdate({ "username": req.body.username }, {
-            "password": req.body.password
-        });
-        console.log(user);
-        res.status(201).json(user);
-    } catch (error) {
-        let errors = alertError(error);
-        console.log(error.message)
-        res.status(400).json({ errors })
-    }
-    res.send();
+    const { username, password, token } = req.body;
+    if (token) {
+        jwt.verify(token, 'chatbot secret', async (err, decodedToken) => {
+            if (err) {
+                console.log(err.message)
+            } else {
+                const cryptPass = await bcrypt.hash(password, SALT_WORK_FACTOR);
+                let user = await User.findOneAndUpdate({ "username": username }, {
+                    "password": cryptPass
+                });
+                user.password = cryptPass;
+                res.json(user);
+            }
+        })
+    } 
 }
 
 module.exports.checkEmail = async (req, res) => {
@@ -113,4 +118,15 @@ module.exports.checkPhone = async (req, res) => {
         res.status(400).json({ errors })
     }
     res.send()
+}
+
+module.exports.checkPass = async (req, res) => {
+    const { check, userPass } = req.body;
+    let isAuth = await bcrypt.compare(check, userPass);
+
+    if (isAuth)
+        res.status(201).json(true);
+    else
+        res.status(201).json(false);
+    res.send();
 }

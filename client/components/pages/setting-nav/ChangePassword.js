@@ -1,36 +1,56 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useContext } from 'react'
 import { View, Text, SafeAreaView, StyleSheet, TextInput, TouchableOpacity, Alert } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import axiosInstance from '../../../AxiosInstance';
-import bcrypt from 'bcryptjs';
+import { UserContext } from '../../../UserContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const ChangePassword = () => {
-
+const ChangePassword = ({navigation}) => {
+  const { user, setUser } = useContext(UserContext);
   const [oldPass, onChangeOld] = React.useState('');
   const [newPass, onChangeNew] = React.useState('');
   const [rePass, onChangeRepass] = React.useState('');
-  const [username, setUsername] = React.useState("vutan");
-  const [user, setUser] = React.useState(null);
 
   const [errorOld, setErrorOld] = React.useState("");
   const [errorNew, setErrorNew] = React.useState("");
   const [errorRe, setErrorRe] = React.useState("");
+  const [flag, setFlag] = React.useState(false);
 
-  const getInfoUser = () => {
-    axiosInstance.get(`/getuser/${username}`)
-      .then(response => {
-        setUser(response.data);
-      }
-      )
-      .catch(err => {
-        console.log(err);
+  const clearError = () => {
+    setErrorOld("");
+    setErrorNew("");
+    setErrorRe("");
+  }
+
+  const clearInput = () => {
+    onChangeOld("");
+    onChangeNew("");
+    onChangeRepass("");
+  }
+  const handleChangePassword = async () => {
+    axiosInstance.put('/updatePassword',
+      JSON.stringify({
+        "username": user.username,
+        "password": newPass,
+        "token": await AsyncStorage.getItem('@storage_token')
+      }), {
+      headers: { "Content-Type": "application/json" }
+    }).then(response => {
+      Alert.alert("", "Change password is complete!", [{
+        text: "OK",
+        style: "default"
+      }]);
+      user.password = response.data.password;
+      navigation.navigate('Account');
+    }
+    )
+      .catch(error => {
+        console.log("error");
       })
   }
 
   const handleValidate = () => {
-    setErrorOld("");
-    setErrorNew("");
-    setErrorRe("");
+    clearError();
     if (oldPass.length == 0) {
       setErrorOld("Old password must be filled!");
       return false;
@@ -48,9 +68,19 @@ const ChangePassword = () => {
       return false;
     }
     if (newPass == rePass) {
-      if (oldPass == user.password) {
+      axiosInstance.put('checkPass',
+        JSON.stringify({
+          "check": oldPass,
+          "userPass": user.password
+        }), {
+        headers: { "Content-Type": "application/json" }
+      }).then(response => {
+        setFlag(response.data);
+      })
+      if (flag) {
         return true;
-      } else {
+      }
+      else {
         setErrorOld("Current password is wrong!");
         return false;
       }
@@ -62,24 +92,12 @@ const ChangePassword = () => {
 
   const buttonClickedHandler = () => {
     if (handleValidate() == true) {
-      user.password = newPass;
-      axiosInstance.put(`/updatePassword`, user)
-        .then(response => {
-          console.log(user);
-          Alert.alert("", "Change password is complete!", [{
-            text: "OK",
-            style: "default"
-          }])
-        }
-        )
-        .catch(err => {
-          console.log(err);
-        })
+      handleChangePassword();
     }
   }
 
   useEffect(() => {
-    getInfoUser();
+
   }, [])
 
   return (
