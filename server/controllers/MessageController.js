@@ -33,7 +33,7 @@ const sendMessage = async (req, res) => {
 
         var witRes = await witClient.message(content)
         console.log('wit response: ' + JSON.stringify(witRes));
-        var reply = await nlp.handleMessage(witRes)
+        var reply = await nlp.handleMessage(witRes, userId)
 
         var newBotMessage = {
             sender: 'bot',

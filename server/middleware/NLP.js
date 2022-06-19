@@ -1,25 +1,7 @@
+const todoController = require('../controllers/todoController')
+const moment = require('moment')
 const getWeather = require('./GetWeather')
-
-const staticResponses = {
-    hello: [
-        "Hey, chào bạn!",
-        "Hi",
-        "Rất vui được gặp bạn",
-        "Xin chào",
-        "Hello"
-    ],
-    praise: [
-        "Cảm ơn về lời khen! :)",
-        "Rất vui khi trò chuyện với bạn",
-        "Hihi",
-        "Đa tạ!"
-    ],
-    botinfo: [
-        "Mình là chatbot do nhóm 3Cat tạo ra",
-        "1 chatbot nhỏ bé giữa thế giới rộng lớn...",
-        "Nếu bạn đã thành tâm muốn biết... Mình là chatbot được tạo ra bởi nhóm 3Cat",
-    ]
-};
+const {staticResponses} = require('./StaticResponses')
 
 let prevIntentName = ''
 
@@ -56,8 +38,9 @@ const processPrevIntent = async (entity) => {
     return reply;
 }
 
+//main
 var nlp = {
-    handleMessage: async (witResponse) => {
+    handleMessage: async (witResponse, userId) => {
         const intentName = witResponse.intents[0]?.name;
         const entities = witResponse.entities
         console.log('intentName ', intentName)
@@ -81,7 +64,12 @@ var nlp = {
             case "weather": {
                 const entityValue = getEntityValue(entities, "name:name")
                 if (entityValue) {
-                    reply = "Thời tiết ở " + entityValue
+                    await getWeather(entityValue).then(result => {
+                        console.log(result)
+                        reply = `Thời tiết ở ${result.name} đang ${result.desc}, nhiệt độ khoảng ${result.temp.toFixed(2)} độ C, độ ẩm khoảng ${result.humidity}%`
+                    }).catch(err => {
+                        reply = "Mình không tìm thấy nơi bạn cần xem thời tiết";
+                    })
                 } else {
                     reply = "Bạn muốn xem thời tiết ở đâu";
                     prevIntentName = intentName;
@@ -94,6 +82,27 @@ var nlp = {
                     reply = processPrevIntent(entityValue)
                 } else {
                     reply = processPrevIntent(witResponse.text)
+                }
+                break;
+            }
+            case "todo": {
+                const listTodo = getEntityValue(entities, "listTodo:listTodo")
+                const addTodo = getEntityValue(entities, "addTodo:addTodo")
+                if (listTodo) {
+                    const todos = await todoController.getList(userId)
+                    reply = "Danh sách công việc\n"
+                    for (let i = 0; i < todos.length; i++) {
+                        reply = reply + `${i + 1}. ${todos[i].content} - ${moment(todos[i].createdAt).format('DD/MM/YYYY')}\n`
+                        //(i + 1) +  + todos[i].content + todos[i].createdAt + "\n"
+                    }
+                } else if (addTodo) {
+                    const textSplit = witResponse.text.split("\"");
+                    const todo = await todoController.create(textSplit[1], userId)
+                    if (todo) {
+                        reply = `Thêm công việc \"${todo.content}\" thành công`
+                    }
+                } else {
+                    reply = "Công việc chưa xác định" 
                 }
                 break;
             }
