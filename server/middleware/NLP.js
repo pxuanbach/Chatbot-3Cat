@@ -23,7 +23,7 @@ const getEntityValue = (entities, key) => {
 const processPrevIntent = async (entity) => {
     let reply = ''
     switch (prevIntentName) {
-        case "weather":
+        case "weather": {
             await getWeather(entity).then(result => {
                 console.log(result)
                 reply = `Thời tiết ở ${result.name} đang ${result.desc}, nhiệt độ khoảng ${result.temp.toFixed(2)} độ C, độ ẩm khoảng ${result.humidity}%`
@@ -31,9 +31,52 @@ const processPrevIntent = async (entity) => {
                 reply = "Mình không tìm thấy nơi bạn cần xem thời tiết";
             })
             break;
+        }
+        case "todo": {
+
+        } 
         default:
             reply = "Xin chào, " + entity;
             break;
+    }
+    return reply;
+}
+
+const processTodo = async (witResText, entities, userId) => {
+    let reply = '';
+    const listTodo = getEntityValue(entities, "listTodo:listTodo")
+    const addTodo = getEntityValue(entities, "addTodo:addTodo")
+    const deleteTodo = getEntityValue(entities, "deleteTodo:deleteTodo")
+    if (listTodo) {
+        const todos = await todoController.getList(userId)
+        reply = "Danh sách công việc\n"
+        for (let i = 0; i < todos.length; i++) {
+            reply = reply + `${i + 1}. ${todos[i].content} - ${moment(todos[i].createdAt).format('DD/MM/YYYY')}\n`
+            //(i + 1) +  + todos[i].content + todos[i].createdAt + "\n"
+        }
+    } else if (addTodo) {
+        const textSplit = witResText.split("\"");
+        //console.log('text length', textSplit.length)
+        if (textSplit.length > 1) {
+            const todo = await todoController.create(textSplit[1], userId)
+            if (todo) {
+                reply = `Thêm công việc \"${todo.content}\" thành công`
+            }
+        } else {
+            reply = `Vui lòng đưa nội dung công việc vào trong dấu ""`
+        }
+    } else if (deleteTodo) {
+        const textSplit = witResText.split("\"");
+        if (textSplit.length > 1) {
+            const todo = await todoController.delete(textSplit[1], userId)
+            if (todo === true) {
+                reply = `Xóa công việc \"${todo.content}\" thành công`
+            }
+        } else {
+            reply = `Vui lòng đưa công việc lựa chọn vào trong dấu ""`
+        }
+    } else {
+        reply = "Công việc chưa xác định" 
     }
     return reply;
 }
@@ -86,24 +129,7 @@ var nlp = {
                 break;
             }
             case "todo": {
-                const listTodo = getEntityValue(entities, "listTodo:listTodo")
-                const addTodo = getEntityValue(entities, "addTodo:addTodo")
-                if (listTodo) {
-                    const todos = await todoController.getList(userId)
-                    reply = "Danh sách công việc\n"
-                    for (let i = 0; i < todos.length; i++) {
-                        reply = reply + `${i + 1}. ${todos[i].content} - ${moment(todos[i].createdAt).format('DD/MM/YYYY')}\n`
-                        //(i + 1) +  + todos[i].content + todos[i].createdAt + "\n"
-                    }
-                } else if (addTodo) {
-                    const textSplit = witResponse.text.split("\"");
-                    const todo = await todoController.create(textSplit[1], userId)
-                    if (todo) {
-                        reply = `Thêm công việc \"${todo.content}\" thành công`
-                    }
-                } else {
-                    reply = "Công việc chưa xác định" 
-                }
+                reply = await processTodo(witResponse.text, entities, userId)
                 break;
             }
             default:
