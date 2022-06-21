@@ -1,7 +1,7 @@
 const todoController = require('../controllers/todoController')
-const moment = require('moment')
 const getWeather = require('./GetWeather')
-const {staticResponses} = require('./StaticResponses')
+const { staticResponses } = require('./StaticResponses')
+const Parser = require('expr-eval').Parser 
 
 let prevIntentName = ''
 
@@ -32,51 +32,9 @@ const processPrevIntent = async (entity) => {
             })
             break;
         }
-        case "todo": {
-
-        } 
         default:
             reply = "Xin chào, " + entity;
             break;
-    }
-    return reply;
-}
-
-const processTodo = async (witResText, entities, userId) => {
-    let reply = '';
-    const listTodo = getEntityValue(entities, "listTodo:listTodo")
-    const addTodo = getEntityValue(entities, "addTodo:addTodo")
-    const deleteTodo = getEntityValue(entities, "deleteTodo:deleteTodo")
-    if (listTodo) {
-        const todos = await todoController.getList(userId)
-        reply = "Danh sách công việc\n"
-        for (let i = 0; i < todos.length; i++) {
-            reply = reply + `${i + 1}. ${todos[i].content} - ${moment(todos[i].createdAt).format('DD/MM/YYYY')}\n`
-            //(i + 1) +  + todos[i].content + todos[i].createdAt + "\n"
-        }
-    } else if (addTodo) {
-        const textSplit = witResText.split("\"");
-        //console.log('text length', textSplit.length)
-        if (textSplit.length > 1) {
-            const todo = await todoController.create(textSplit[1], userId)
-            if (todo) {
-                reply = `Thêm công việc \"${todo.content}\" thành công`
-            }
-        } else {
-            reply = `Vui lòng đưa nội dung công việc vào trong dấu ""`
-        }
-    } else if (deleteTodo) {
-        const textSplit = witResText.split("\"");
-        if (textSplit.length > 1) {
-            const todo = await todoController.delete(textSplit[1], userId)
-            if (todo === true) {
-                reply = `Xóa công việc \"${todo.content}\" thành công`
-            }
-        } else {
-            reply = `Vui lòng đưa công việc lựa chọn vào trong dấu ""`
-        }
-    } else {
-        reply = "Công việc chưa xác định" 
     }
     return reply;
 }
@@ -129,7 +87,17 @@ var nlp = {
                 break;
             }
             case "todo": {
-                reply = await processTodo(witResponse.text, entities, userId)
+                reply = await todoController.processTodo(witResponse.text, entities, userId)
+                break;
+            }
+            case "calculator": {
+                const entityValue = getEntityValue(entities, "wit$math_expression:math_expression")
+                if (entityValue) {
+                    var expr = Parser.evaluate(entityValue)
+                    reply = `Kết quả là ${expr}`
+                } else {
+                    reply = "Bạn có thể nhập phép tính vào được không"
+                }
                 break;
             }
             default:
