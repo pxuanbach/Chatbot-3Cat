@@ -1,5 +1,6 @@
 const todoController = require('../controllers/todoController')
 const getWeather = require('./GetWeather')
+const getTranslate = require('./Translate')
 const { staticResponses } = require('./StaticResponses')
 const Parser = require('expr-eval').Parser 
 
@@ -30,6 +31,10 @@ const processPrevIntent = async (entity) => {
             }).catch(err => {
                 reply = "Mình không tìm thấy nơi bạn cần xem thời tiết";
             })
+            break;
+        }
+        case "translate": {
+            reply = await getTranslate(entity)   //wisRes text
             break;
         }
         default:
@@ -97,6 +102,16 @@ var nlp = {
                     reply = `Kết quả là ${expr}`
                 } else {
                     reply = "Bạn có thể nhập phép tính vào được không"
+                }
+                break;
+            }
+            case "translate": {
+                if (prevIntentName === intentName) {
+                    reply = processPrevIntent(witResponse.text)
+                    prevIntentName = '';
+                } else {
+                    reply = "Bạn hãy đưa từ cần dịch cho mình";
+                    prevIntentName = intentName;
                 }
                 break;
             }
