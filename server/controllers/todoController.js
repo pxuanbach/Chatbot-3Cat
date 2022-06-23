@@ -80,13 +80,14 @@ module.exports.processTodo = async (witResText, entities, userId) => {
             reply = `Vui lòng đưa nội dung công việc vào trong dấu ""`
         }
     } else if (deleteTodo) {
-        const witNumber = getEntityValue(entities, "wit$number:number")
-        if (witNumber) {
-            const todo = await deleteByNumber(witNumber, userId)
+        const orderOfTodo = getEntityValue(entities, "orderOfTodo:orderOfTodo")
+        if (orderOfTodo) {
+            var number = orderOfTodo.match(/(\d+)/);
+            const todo = await deleteByNumber(number[0], userId)
             if (todo) {
-                reply = `Xóa công việc thứ \"${witNumber}\" thành công`
+                reply = `Xóa công việc thứ \"${number[0]}\" thành công`
             } else {
-                reply = `Xóa công việc thứ \"${witNumber}\" thất bại`
+                reply = `Xóa công việc thứ \"${number[0]}\" thất bại`
             }
         } else {
             const textSplit = witResText.split("\"");
