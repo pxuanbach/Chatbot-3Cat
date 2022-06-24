@@ -24,7 +24,7 @@ async function getTranslate(text) {
     
         const response = await axios.request(options)
         if (response.data) {
-            return response.data.translations[0].translatedText;
+            return `Nghĩa là: ${response.data.data.translations[0].translatedText}`;
         } else {
             return "Rất tiêc mình không hiểu được nó"
         }
