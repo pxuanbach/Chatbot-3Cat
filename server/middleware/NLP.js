@@ -1,6 +1,6 @@
 const todoController = require('../controllers/todoController')
 const getWeather = require('./GetWeather')
-const getTranslate = require('./Translate')
+const getTranslate = require('./GetTranslate')
 const { staticResponses } = require('./StaticResponses')
 const Parser = require('expr-eval').Parser
 
@@ -32,6 +32,11 @@ const processPrevIntent = async (entity) => {
             }).catch(err => {
                 reply = "Mình không tìm thấy nơi bạn cần xem thời tiết";
             })
+            break;
+        }
+        case "calculator": {
+            var expr = Parser.evaluate(entity)
+            reply = `Kết quả là ${expr}`
             break;
         }
         case "translate": {
@@ -102,17 +107,20 @@ var nlp = {
                     break;
                 }
                 case "calculator": {
-                    const entityValue = getEntityValue(entities, "wit$math_expression:math_expression")
+                    const entityValue = getEntityValue(entities,
+                        "wit$math_expression:math_expression")
                     if (entityValue) {
                         var expr = Parser.evaluate(entityValue)
                         reply = `Kết quả là ${expr}`
                     } else {
                         reply = "Bạn có thể nhập phép tính vào được không"
+                        prevIntentName = intentName;
+                        isSkipForPreviewIntent = true;
                     }
                     break;
                 }
                 case "translate": {
-                    const entityValue = getEntityValue(entities, 
+                    const entityValue = getEntityValue(entities,
                         'wit$phrase_to_translate:phrase_to_translate')
                     if (entityValue) {
                         reply = await getTranslate(entityValue)
