@@ -1,6 +1,7 @@
-const todoController = require('../controllers/todoController')
+const HandleTodo = require('./HandleTodo')
 const getWeather = require('./GetWeather')
 const getTranslate = require('./GetTranslate')
+const getCovid = require('./GetCovid')
 const { staticResponses } = require('./StaticResponses')
 const Parser = require('expr-eval').Parser
 
@@ -103,7 +104,8 @@ var nlp = {
                     break;
                 }
                 case "todo": {
-                    reply = await todoController.processTodo(witResponse.text, entities, userId)
+                    reply = await HandleTodo
+                        .processTodo(witResponse.text, entities, userId)
                     break;
                 }
                 case "calculator": {
@@ -129,6 +131,10 @@ var nlp = {
                         prevIntentName = intentName;
                         isSkipForPreviewIntent = true;
                     }
+                    break;
+                }
+                case "covid": {
+                    reply = await getCovid();
                     break;
                 }
                 default:

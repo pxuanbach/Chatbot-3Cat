@@ -68,7 +68,7 @@ module.exports.processTodo = async (witResText, entities, userId) => {
         }
     } else if (addTodo) {
         const textSplit = witResText.split("\"");
-        //console.log('text length', textSplit.length)
+        //console.log('text length', textSplit.length)The
         if (textSplit.length > 1) {
             const todo = await create(textSplit[1], userId)
             if (todo) {
