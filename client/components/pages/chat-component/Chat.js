@@ -73,7 +73,8 @@ const styles = StyleSheet.create({
     shadowOpacity: 0,
     height: "12%",
     width: '100%',
-    padding: '4%'
+    padding: '4%',
+    minHeight: 75
   }
 })
 
