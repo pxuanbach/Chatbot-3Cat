@@ -30,6 +30,7 @@ async function getTranslate(text) {
         }
     } catch (err) {
         console.log(err.message)
+        return "Đã có lỗi xảy ra"
     }
 }
 

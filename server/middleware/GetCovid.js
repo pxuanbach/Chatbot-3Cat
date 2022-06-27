@@ -47,6 +47,7 @@ async function getCovid() {
         }
     } catch (err) {
         console.log(err.message)
+        return "Đã có lỗi xảy ra"
     }
 }
 
