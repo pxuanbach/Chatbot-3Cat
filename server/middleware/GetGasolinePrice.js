@@ -1,4 +1,5 @@
 const axios = require("axios");
+const convertCurrency = require('./ConvertCurrency')
 const dotenv = require('dotenv')
 
 dotenv.config()
@@ -16,7 +17,9 @@ async function getGasolinePrice() {
     
         const response = await axios.request(options)
         if (response.data) {
-            console.log(response.data) 
+            console.log(response.data[0].gasoline_price)
+            const gasoline_price = await convertCurrency("USD", "VND", response.data[0].gasoline_price)
+            return `Xăng đang có giá ${gasoline_price}/lít`
         } else {
             return "Xin lỗi mình cần học nhiều hơn"
         }

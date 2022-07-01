@@ -155,6 +155,10 @@ var nlp = {
                     reply = await convertCurrency(currencyFrom, currencyTo, amount)
                     break;
                 }
+                case "gasoline": {
+                    reply = await getGasolinePrice()
+                    break;
+                }
                 default:
                     reply = "Xin lỗi, mình cần học nhiều hơn"
                     break;
