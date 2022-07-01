@@ -3,12 +3,35 @@ import {
   View, StyleSheet, KeyboardAvoidingView,
   Platform, TouchableOpacity, TextInput
 } from 'react-native';
+import { Audio } from 'expo-av'
 import { Octicons } from '@expo/vector-icons';
 import { SimpleLineIcons } from '@expo/vector-icons';
 import axiosInstance from '../../../AxiosInstance';
 
+const recordingOptions = {
+  android: {
+      extension: '.m4a',
+      outputFormat: Audio.RECORDING_OPTION_ANDROID_OUTPUT_FORMAT_MPEG_4,
+      audioEncoder: Audio.RECORDING_OPTION_ANDROID_AUDIO_ENCODER_AAC,
+      sampleRate: 44100,
+      numberOfChannels: 1,
+      bitRate: 128000,
+  },
+  ios: {
+      extension: '.wav',
+      audioQuality: Audio.RECORDING_OPTION_IOS_AUDIO_QUALITY_HIGH,
+      sampleRate: 44100,
+      numberOfChannels: 1,
+      bitRate: 128000,
+      linearPCMBitDepth: 16,
+      linearPCMIsBigEndian: false,
+      linearPCMIsFloat: false,
+  },
+}
+
 const InputBox = ({ user, setMessages }) => {
   const [message, setMessage] = useState('');
+  const [recording, setRecording] = useState();
 
   const handleSpeechToText = () => {
 
@@ -32,11 +55,38 @@ const InputBox = ({ user, setMessages }) => {
             setMessages(preMessages => [...preMessages, response.data.botMessage])
           }
         }, 500)
-        
+
       }).catch(err => {
         console.log("Send message err", err.response.data.error)
-      }) 
+      })
     }
+  }
+
+  async function startRecording() {
+    try {
+      console.log('Requesting permissions..');
+      await Audio.requestPermissionsAsync();
+      await Audio.setAudioModeAsync({
+        allowsRecordingIOS: true,
+        playsInSilentModeIOS: true,
+      }); 
+      console.log('Starting recording..');
+      const { recording } = await Audio.Recording.createAsync(
+         Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY
+      );
+      setRecording(recording);
+      console.log('Recording started');
+    } catch (err) {
+      console.error('Failed to start recording', err);
+    }
+  }
+
+  async function stopRecording() {
+    console.log('Stopping recording..');
+    setRecording(undefined);
+    await recording.stopAndUnloadAsync();
+    const uri = recording.getURI(); 
+    console.log('Recording stopped and stored at', uri);
   }
 
   return (
@@ -47,9 +97,10 @@ const InputBox = ({ user, setMessages }) => {
     >
       <View style={styles.container}>
         <View style={styles.mainContainer}>
-          <TouchableOpacity onPress={handleSpeechToText}>
+          <TouchableOpacity onPress={recording ? stopRecording : startRecording}>
             <View style={styles.buttonContainer}>
-              <SimpleLineIcons name="microphone" size={24} color="#7046E7" />
+              {recording ? <SimpleLineIcons name="control-pause" size={24} color="#7046E7" /> 
+              : <SimpleLineIcons name="microphone" size={24} color="#7046E7" />}
             </View>
           </TouchableOpacity>
           <TextInput
