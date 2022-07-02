@@ -2,6 +2,7 @@ const HandleTodo = require('./HandleTodo')
 const getWeather = require('./GetWeather')
 const getTranslate = require('./GetTranslate')
 const getCovid = require('./GetCovid')
+const getCoin = require('./GetCoin')
 const { staticResponses } = require('./StaticResponses')
 const Parser = require('expr-eval').Parser
 
@@ -135,6 +136,18 @@ var nlp = {
                 }
                 case "covid": {
                     reply = await getCovid();
+                    break;
+                }
+                case "dataCoin": {
+                    const entityValue = getEntityValue(entities,
+                        "nameCoin:nameCoin")
+                    if (entityValue) {
+                        reply = await getCoin(entityValue);
+                    } else {
+                        reply = "Bạn hãy đưa tên đồng tiền ảo cần tìm";
+                        prevIntentName = intentName;
+                        isSkipForPreviewIntent = true;
+                    }
                     break;
                 }
                 default:
