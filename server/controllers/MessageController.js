@@ -30,10 +30,14 @@ const sendMessage = async (req, res) => {
             user: userId
         };
         var message = await Message.create(newMessage);
-
-        var witRes = await witClient.message(content)
-        console.log('wit response: ' + JSON.stringify(witRes));
-        var reply = await nlp.handleMessage(witRes)
+        let reply = ''
+        if (content.length > 270) {
+            reply = "Tin nhắn của bạn quá dài mình không hiểu được, mình chỉ hiểu được tin nhắn dưới 270 ký tự thôi"
+        } else {
+            var witRes = await witClient.message(content)
+            console.log('wit response: ' + JSON.stringify(witRes));
+            reply = await nlp.handleMessage(witRes, userId)
+        }
 
         var newBotMessage = {
             sender: 'bot',
