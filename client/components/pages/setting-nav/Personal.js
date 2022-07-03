@@ -6,7 +6,7 @@ import * as ImagePicker from 'expo-image-picker';
 import axiosInstance from '../../../AxiosInstance'
 import { UserContext } from '../../../UserContext';
 
-const Personal = () => {
+const Personal = ({ navigation }) => {
 
   const [photo, setPhoto] = React.useState('https://i1-giaitri.vnecdn.net/2022/04/28/Avatar-2-James-Cameron-5081-1651112580.jpg?w=1020&h=0&q=100&dpr=1&fit=crop&s=aYcWeARCH8Qs2Ideel6lgA');
 
@@ -14,6 +14,7 @@ const Personal = () => {
   const [errorCareer, setErrorCareer] = React.useState("");
   const [errorEmail, setErrorEmail] = React.useState("");
   const [errorPhone, setErrorPhone] = React.useState("");
+  const { user, setUser } = useContext(UserContext);
 
   const handleChoosePhoto = async () => {
     // No permissions request is necessary for launching the image library
@@ -32,7 +33,7 @@ const Personal = () => {
   };
 
   const getInfoUser = () => {
-    axiosInstance.get(`/getuser/${username}`)
+    axiosInstance.get(`/getuser/${user.username}`)
       .then(response => {
         setUser(response.data);
         onChangeName(response.data.name);
@@ -72,7 +73,7 @@ const Personal = () => {
         }
       })
       .catch(error => {
-        console.log('1');
+        console.log(error);
       })
 
       axiosInstance.get(`/checkPhone/${number}`)
@@ -83,7 +84,7 @@ const Personal = () => {
         }
       })
       .catch(error => {
-        console.log('2');
+        console.log(error);
       })
     return true;
   }
@@ -97,7 +98,7 @@ const Personal = () => {
       axiosInstance.put(`/updateUser`, user)
         .then(response => {
           console.log(user);
-
+          navigation.navigate('Account');
         }
         )
         .catch(err => {
@@ -110,8 +111,6 @@ const Personal = () => {
   const [career, onChangeCareer] = React.useState('');
   const [email, onChangeEmail] = React.useState('');
   const [number, onChangeNumber] = React.useState('');
-  const [username, setUsername] = React.useState("vutan");
-  const [user, setUser] = React.useState(null);
 
   useEffect(() => {
     getInfoUser();

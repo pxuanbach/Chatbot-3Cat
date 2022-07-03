@@ -4,6 +4,7 @@ const getTranslate = require('./GetTranslate')
 const getCovid = require('./GetCovid')
 const getGasolinePrice = require('./GetGasolinePrice')
 const convertCurrency = require('./ConvertCurrency')
+const getCoin = require('./GetCoin')
 const { staticResponses } = require('./StaticResponses')
 const Parser = require('expr-eval').Parser
 
@@ -157,6 +158,18 @@ var nlp = {
                 }
                 case "gasoline": {
                     reply = await getGasolinePrice()
+                    break;
+                }
+                case "dataCoin": {
+                    const entityValue = getEntityValue(entities,
+                        "nameCoin:nameCoin")
+                    if (entityValue) {
+                        reply = await getCoin(entityValue);
+                    } else {
+                        reply = "Bạn hãy đưa tên đồng tiền ảo cần tìm";
+                        prevIntentName = intentName;
+                        isSkipForPreviewIntent = true;
+                    }
                     break;
                 }
                 default:
