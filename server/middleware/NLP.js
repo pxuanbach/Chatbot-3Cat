@@ -6,6 +6,7 @@ const getCoin = require('./GetCoin')
 const { staticResponses } = require('./StaticResponses')
 const Parser = require('expr-eval').Parser
 const getNews = require('./GetBlockChainNews')
+const getFact = require('./GetFact')
 
 let prevIntentName = '';
 let isSkipForPreviewIntent = false;
@@ -153,6 +154,10 @@ var nlp = {
                 }
                 case "BlockChainNews": {
                     reply = await getNews();
+                    break;
+                }
+                case "RandomFact": {
+                    reply = await getFact();
                     break;
                 }
                 default:
