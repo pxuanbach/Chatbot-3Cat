@@ -4,6 +4,7 @@ import {
   Platform, TouchableOpacity, TextInput
 } from 'react-native';
 import { Audio } from 'expo-av'
+import * as Speech from 'expo-speech';
 import { Octicons } from '@expo/vector-icons';
 import { SimpleLineIcons } from '@expo/vector-icons';
 import axiosInstance from '../../../AxiosInstance';
@@ -12,9 +13,9 @@ const InputBox = ({ user, setMessages }) => {
   const [message, setMessage] = useState('');
   const [recording, setRecording] = useState();
 
-  const handleSpeechToText = () => {
-
-  }
+  const speak = (text) => {
+    Speech.speak(text);
+  };
 
   const handleSendMessage = () => {
     if (message) {
@@ -32,6 +33,7 @@ const InputBox = ({ user, setMessages }) => {
         setTimeout(() => {
           if (response.data.botMessage) {
             setMessages(preMessages => [...preMessages, response.data.botMessage])
+            speak(response.data.botMessage)
           }
         }, 500)
 
