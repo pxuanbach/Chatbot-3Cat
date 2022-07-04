@@ -1,87 +1,89 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect, useContext } from "react";
 import {
-  View, StyleSheet, KeyboardAvoidingView,
-  Platform, TouchableOpacity, TextInput
-} from 'react-native';
-import { Audio } from 'expo-av'
-import * as Speech from 'expo-speech';
-import { Octicons } from '@expo/vector-icons';
-import { SimpleLineIcons } from '@expo/vector-icons';
-import axiosInstance from '../../../AxiosInstance';
+  View,
+  StyleSheet,
+  KeyboardAvoidingView,
+  Platform,
+  TouchableOpacity,
+  TextInput,
+} from "react-native";
+import * as Speech from "expo-speech";
+import { SettingContext } from "../../../SettingContext";
+import { Octicons } from "@expo/vector-icons";
+import { SimpleLineIcons } from "@expo/vector-icons";
+import axiosInstance from "../../../AxiosInstance";
 
 const InputBox = ({ user, setMessages }) => {
-  const [message, setMessage] = useState('');
+  const { setting } = useContext(SettingContext);
+  const [message, setMessage] = useState("");
   const [recording, setRecording] = useState();
 
   const speak = (text) => {
-    Speech.speak(text);
+    const options = {
+      voice: setting?.voice.identifier,
+      pitch: 1.0,
+      rate: (Number.parseFloat(setting.rate) / 100).toFixed(2),
+    };
+    if (setting.isCheck === "true") {
+      Speech.speak(text, options);
+    }
   };
 
   const handleSendMessage = () => {
-    if (message) {
-      axiosInstance.post('/message',
-        JSON.stringify({
-          "content": message,
-          "userId": user._id
-        }), {
-        headers: { "Content-Type": "application/json" }
-      }).then(response => {
-        if (response.data.message) {
-          setMessages(preMessages => [...preMessages, response.data.message])
-          setMessage('')
-        }
-        setTimeout(() => {
-          if (response.data.botMessage) {
-            setMessages(preMessages => [...preMessages, response.data.botMessage])
-            speak(response.data.botMessage)
+    if (message !== "") {
+      axiosInstance
+        .post(
+          "/message",
+          JSON.stringify({
+            content: message,
+            userId: user._id,
+          }),
+          {
+            headers: { "Content-Type": "application/json" },
           }
-        }, 500)
-
-      }).catch(err => {
-        console.log("Send message err", err.response.data.error)
-      })
+        )
+        .then((response) => {
+          if (response.data.message) {
+            setMessages((preMessages) => [
+              ...preMessages,
+              response.data.message,
+            ]);
+            setMessage("");
+          }
+          setTimeout(() => {
+            const botMess = response.data.botMessage;
+            if (botMess) {
+              //console.log(botMess)
+              setMessages((preMessages) => [...preMessages, botMess]);
+              speak(botMess.content);
+            }
+          }, 500);
+        })
+        .catch((err) => {
+          console.log("Send message err", err.response.data.error);
+        });
     }
-  }
-
-  async function startRecording() {
-    try {
-      console.log('Requesting permissions..');
-      await Audio.requestPermissionsAsync();
-      await Audio.setAudioModeAsync({
-        allowsRecordingIOS: true,
-        playsInSilentModeIOS: true,
-      }); 
-      console.log('Starting recording..');
-      const { recording } = await Audio.Recording.createAsync(
-         Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY
-      );
-      setRecording(recording);
-      console.log('Recording started');
-    } catch (err) {
-      console.error('Failed to start recording', err);
-    }
-  }
-
-  async function stopRecording() {
-    console.log('Stopping recording..');
-    setRecording(undefined);
-    await recording.stopAndUnloadAsync();
-    const uri = recording.getURI(); 
-    console.log('Recording stopped and stored at', uri);
-  }
+  };
 
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS == "ios" ? "padding" : "height"}
       keyboardVerticalOffset={100}
-      style={{ width: '100%', }}
+      style={{ width: "100%" }}
     >
       <View style={styles.container}>
         <View style={styles.mainContainer}>
-          <TouchableOpacity onPress={recording ? stopRecording : startRecording}>
+          <TouchableOpacity onPress={() => speak("Hello")}>
             <View style={styles.buttonContainer}>
-              {recording ? <SimpleLineIcons name="control-pause" size={24} color="#7046E7" /> 
-              : <SimpleLineIcons name="microphone" size={24} color="#7046E7" />}
+              {recording ? (
+                <SimpleLineIcons
+                  name="control-pause"
+                  size={24}
+                  color="#7046E7"
+                />
+              ) : (
+                <SimpleLineIcons name="microphone" size={24} color="#7046E7" />
+              )}
             </View>
           </TouchableOpacity>
           <TextInput
@@ -99,42 +101,42 @@ const InputBox = ({ user, setMessages }) => {
         </View>
       </View>
     </KeyboardAvoidingView>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    backgroundColor: 'transparent',
+    flexDirection: "row",
+    alignItems: "flex-end",
+    backgroundColor: "transparent",
     margin: 10,
-    marginTop: 5
+    marginTop: 5,
   },
   mainContainer: {
-    flexDirection: 'row',
-    backgroundColor: '#F8F8F8',
+    flexDirection: "row",
+    backgroundColor: "#F8F8F8",
     borderRadius: 25,
     marginHorizontal: 10,
     padding: 5,
     flex: 1,
-    alignItems: 'center',
-    borderColor: '#E2DBDB',
-    borderWidth: 1
+    alignItems: "center",
+    borderColor: "#E2DBDB",
+    borderWidth: 1,
   },
   buttonContainer: {
-    backgroundColor: '#DADFEC',
+    backgroundColor: "#DADFEC",
     borderRadius: 25,
     padding: 10,
     fontSize: 18,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   textInput: {
     flex: 1,
     fontSize: 18,
     marginHorizontal: 10,
-    maxHeight: 86
+    maxHeight: 86,
   },
-})
+});
 
-export default InputBox
+export default InputBox;

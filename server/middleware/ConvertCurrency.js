@@ -18,7 +18,7 @@ async function convertCurrency(from, to, amount) {
         const response = await axios.request(options)
         if (response.data.success) {
             const { from, to, amountToConvert, convertedAmount } = response.data.result
-            return `${amountToConvert} ${from} = ${convertedAmount} ${to}`
+            return `${amountToConvert} ${from} = ${Number.parseFloat(convertedAmount).toFixed(2)} ${to}`
         } else {
             return "Mình không biết tiền tệ bạn cần quy đổi"
         }

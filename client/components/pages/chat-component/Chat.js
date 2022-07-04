@@ -27,6 +27,7 @@ const Chat = ({ navigation }) => {
     if (user) {
       axiosInstance.get(`/message/${user._id}`)
         .then(response => {
+          console.log(response.data)
           setMessages(response.data)
         }).catch(err => {
           console.log(err.response.data)
@@ -45,7 +46,7 @@ const Chat = ({ navigation }) => {
             <Text style={{ fontSize: 16, color: "#7046E7" }}>CLEAR ALL</Text>
           </TouchableOpacity>
         </View>
-        {user ? <ChatList messages={messages} /> : <></>}
+        <ChatList messages={messages} />
         <InputBox user={user} setMessages={setMessages} />
       </View>
   )

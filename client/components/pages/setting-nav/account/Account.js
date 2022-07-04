@@ -4,17 +4,21 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import LinearGradientBackground from '../../../reusable/LinearGradientBackground';
 import OptionButton from './OptionButton';
 import {UserContext} from '../../../../UserContext'
+import { SettingContext } from '../../../../SettingContext';
 
 const { width } = Dimensions.get('screen');
 const imageSize = width / 3
 
 const Account = ({ navigation }) => {
-  const {user, setUser} = useContext(UserContext)
+  const {setUser} = useContext(UserContext)
+  const {setSetting} = useContext(SettingContext)
 
   const handleLogout = async () => {
     try {
       await AsyncStorage.removeItem('@storage_token');
+      await AsyncStorage.removeItem('@storage_setting');
       setUser(null)
+      setSetting(null)
     } catch(error) {
       console.log("logout", error)
     }

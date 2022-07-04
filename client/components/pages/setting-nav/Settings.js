@@ -1,71 +1,107 @@
-import React from 'react'
-import { View, Text, StyleSheet, SafeAreaView, ToastAndroid } from 'react-native';
-import { Slider } from 'react-native-elements';
-import CustomCheckBox from './CustomCheckBox';
+import React, { useState, useEffect, useContext } from "react";
+import { View, Text, StyleSheet, SafeAreaView } from "react-native";
+import { Slider } from "react-native-elements";
+import CustomCheckBox from "./CustomCheckBox";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { SettingContext } from "../../../SettingContext";
 
 const Settings = () => {
-  const [checkPronounce, setPronounce] = React.useState(false);
-  const [checkRecord, setRecord] = React.useState(false);
-  const [checkNoti, setNoti] = React.useState(false);
-  const [sliderValue, setSliderValue] = React.useState(70);
+  const { setting, setSetting } = useContext(SettingContext);
+  const [checkPronounce, setPronounce] = useState(false);
+  const [sliderValue, setSliderValue] = useState(10);
+
+  const handleCheckPronounce = async () => {
+    const value = !checkPronounce
+    setPronounce(value)
+    const curSetting = {
+      "isCheck": value,
+      "rate": sliderValue,
+      "voice": setting.voice
+    }
+    await AsyncStorage.setItem('@storage_setting', JSON.stringify(curSetting))
+    setSetting(curSetting) 
+  }
+
+  const handleSliderComplete = async (value) => {
+    setSliderValue(value)
+    const curSetting = {
+      "isCheck": checkPronounce,
+      "rate": value,
+      "voice": setting.voice
+    }
+    await AsyncStorage.setItem('@storage_setting', JSON.stringify(curSetting))
+    setSetting(curSetting) 
+  }
+
+  useEffect(() => {
+    if (setting) {
+      console.log(typeof setting.isCheck)
+      setPronounce(setting.isCheck === "true")
+      setSliderValue(parseInt(setting.rate))
+    }
+  }, [setting]);
 
   return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'flex-start', backgroundColor: '#FFFFFF' }}>
-      <SafeAreaView style={{ flex: 1, alignItems: 'flex-start', justifyContent: "flex-start" }}>
+    <View
+      style={{
+        flex: 1,
+        alignItems: "center",
+        justifyContent: "flex-start",
+        backgroundColor: "#FFFFFF",
+      }}
+    >
+      <SafeAreaView
+        style={{
+          alignItems: "flex-start",
+          justifyContent: "flex-start",
+        }}
+      >
         <Text style={styles.title}>Music</Text>
         <View style={styles.checkboxContainer}>
           <CustomCheckBox
-            onPress={() => setPronounce(!checkPronounce)}
+            onPress={handleCheckPronounce}
             title="Always pronounce feedback"
             isChecked={checkPronounce}
           />
-          <CustomCheckBox
-            onPress={() => setRecord(!checkRecord)}
-            title="Allow voice recording"
-            isChecked={checkRecord}
-          />
-          <CustomCheckBox
-            onPress={() => setNoti(!checkNoti)}
-            title="Get notifications"
-            isChecked={checkNoti}
-          />
         </View>
       </SafeAreaView>
-      <View style={{ flex: 1, alignItems: "flex-start", justifyContent: "flex-start" }}>
+      <View
+        style={{
+          alignItems: "flex-start",
+          justifyContent: "flex-start",
+        }}
+      >
         <Text style={styles.title}>Speaking Speed</Text>
         <Slider
           style={{ width: 300, height: 20 }}
           minimumValue={0}
-          maximumValue={100}
+          maximumValue={200}
           maximumTrackTintColor="#D0CECF"
           minimumTrackTintColor="#32B3FC"
           value={sliderValue}
-          onValueChange={(sliderValue => setSliderValue(sliderValue))}
-          thumbTintColor='white'
-          thumbStyle={styles.thumb} />
-        <Text
-          style={styles.content}
-        >
-         {sliderValue.toFixed()}
-        </Text>
+          onSlidingComplete={async (value) => handleSliderComplete(value)}
+          thumbTintColor="white"
+          thumbStyle={styles.thumb}
+        />
+        <Text style={styles.content}>{sliderValue.toFixed()}</Text>
       </View>
       <View style={{ flex: 1 }}></View>
     </View>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   title: {
     justifyContent: "flex-start",
-    color: '#19377A',
-    fontWeight: '500',
+    color: "#19377A",
+    fontWeight: "500",
     fontSize: 20,
     marginVertical: 20,
   },
   thumb: {
     width: 20,
     height: 20,
-    borderColor: 'lightgray',
+    borderColor: "lightgray",
     borderWidth: 2,
   },
   roundButton: {
@@ -79,7 +115,6 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
   },
   checkboxContainer: {
-
     width: 300,
   },
   content: {
@@ -98,7 +133,7 @@ const styles = StyleSheet.create({
     shadowRadius: 4.65,
 
     elevation: 6,
-  }
+  },
 });
 
-export default Settings
+export default Settings;
