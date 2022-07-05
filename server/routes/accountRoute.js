@@ -9,5 +9,6 @@ router.get('/checkPhone/:phone', authController.checkPhone)
 router.put('/checkPass/', authController.checkPass)
 router.put('/updateUser/', authController.updatePersonal)
 router.put('/updatePassword/', authController.updatePassword)
+router.put('/updateAvatar/', authController.updateAvatar)
 module.exports = router;
 

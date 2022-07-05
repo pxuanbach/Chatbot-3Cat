@@ -92,6 +92,23 @@ module.exports.updatePassword = async (req, res) => {
     } 
 }
 
+module.exports.updateAvatar = async (req, res) => {
+    const { username, avatar, token } = req.body;
+    if (token) {
+        jwt.verify(token, 'chatbot secret', async (err, decodedToken) => {
+            if (err) {
+                console.log(err.message)
+            } else {
+                let user = await User.findOneAndUpdate({ "username": username }, {
+                    "avatar": avatar
+                });
+                user.avatar = avatar;
+                res.json(user);
+            }
+        })
+    } 
+}
+
 module.exports.checkEmail = async (req, res) => {
     const { email } = req.params;
     try {

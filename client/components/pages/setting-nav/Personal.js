@@ -5,10 +5,11 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import * as ImagePicker from 'expo-image-picker';
 import axiosInstance from '../../../AxiosInstance'
 import { UserContext } from '../../../UserContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Personal = ({ navigation }) => {
 
-  const [photo, setPhoto] = React.useState('https://i1-giaitri.vnecdn.net/2022/04/28/Avatar-2-James-Cameron-5081-1651112580.jpg?w=1020&h=0&q=100&dpr=1&fit=crop&s=aYcWeARCH8Qs2Ideel6lgA');
+  const [photo, setPhoto] = React.useState('https://haycafe.vn/wp-content/uploads/2021/11/Anh-avatar-dep-chat-lam-hinh-dai-dien.jpg');
 
   const [errorName, setErrorname] = React.useState("");
   const [errorCareer, setErrorCareer] = React.useState("");
@@ -28,9 +29,50 @@ const Personal = ({ navigation }) => {
     console.log(result);
 
     if (!result.cancelled) {
-      setPhoto(result.uri);
+      let newFile = {uri:result.uri, 
+        type:`test/${result.uri.split(".")[3]}`, 
+        name:`test.${result.uri.split(".")[2]}`}
+        console.log(newFile)
+      handleUpPhoto(newFile)
     }
   };
+
+  const handleUpPhoto = (pic) => {
+    const data = new FormData()
+    data.append('file', pic)
+    data.append("upload_preset", "_Chatbot3Cat")
+    data.append("cloud_name","chatbot3cat")
+    fetch("https://api.cloudinary.com/v1_1/chatbot3cat/image/upload", {
+      method:'POST',
+      body:data,
+      headers: {
+        'Accept':'application/json',
+        'Content-Type':'multipart/form-data'
+      }
+    }).then(res => res.json())
+    .then(data => {
+      setPhoto(data.url)
+      handleUpdateAvatar(data.url)
+    }).catch(err => console.log(err))
+  }
+
+  const handleUpdateAvatar = async (data) => {
+    axiosInstance.put('/updateAvatar',
+      JSON.stringify({
+        "username": user.username,
+        "avatar": data,
+        "token": await AsyncStorage.getItem('@storage_token')
+      }), {
+      headers: { "Content-Type": "application/json" }
+    }).then(response => {
+      user.avatar = response.data.avatar;
+      setUser(user);
+    }
+    )
+      .catch(error => {
+        console.log("error");
+      })
+    }
 
   const getInfoUser = () => {
     axiosInstance.get(`/getuser/${user.username}`)
@@ -40,7 +82,9 @@ const Personal = ({ navigation }) => {
         onChangeCareer(response.data.career);
         onChangeEmail(response.data.email);
         onChangeNumber(response.data.phone);
-      }
+        if (response.data.avatar)
+          setPhoto(response.data.avatar);
+        }
       )
       .catch(err => {
         console.log(err);
@@ -119,7 +163,7 @@ const Personal = ({ navigation }) => {
   return (
     <KeyboardAwareScrollView style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'space-evenly', backgroundColor: '#FFFFFF', marginTop: 20 }}>
-        {photo && (
+
           <>
             <Avatar
               avatarStyle={{ borderWidth: 3, overflow: "hidden", borderColor: 'lightblue', borderRadius: 100 }}
@@ -128,14 +172,13 @@ const Personal = ({ navigation }) => {
               size={150}
               source={{
                 uri:
-                  photo.uri,
+                  photo,
               }}
               onPress={handleChoosePhoto}
             >
             </Avatar>
           </>
-        )
-        }
+        
         <View>
           <Text style={styles.title}>Name</Text>
           <TextInput
