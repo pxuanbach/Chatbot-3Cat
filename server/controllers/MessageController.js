@@ -20,8 +20,10 @@ const sendMessage = async (req, res) => {
         const { content, userId } = req.body;
 
         if (!content || !userId) {
+            console.log(content, userId)
             console.log("Invalid data passed into request");
             res.status(400).send({ error: "Invalid data passed into request" });
+            return;
         }
 
         var newMessage = {

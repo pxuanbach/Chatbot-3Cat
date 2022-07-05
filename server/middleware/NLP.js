@@ -2,6 +2,8 @@ const HandleTodo = require('./HandleTodo')
 const getWeather = require('./GetWeather')
 const getTranslate = require('./GetTranslate')
 const getCovid = require('./GetCovid')
+const getGasolinePrice = require('./GetGasolinePrice')
+const convertCurrency = require('./ConvertCurrency')
 const getCoin = require('./GetCoin')
 const { staticResponses } = require('./StaticResponses')
 const Parser = require('expr-eval').Parser
@@ -22,6 +24,15 @@ const getEntityValue = (entities, key) => {
     console.log("entity", entity)
     if (entity) {
         return entity[0].value
+    }
+    return null;
+}
+
+const getEntityUnit = (entities, key) => {
+    const entity = entities[key];
+    console.log("entity", entity)
+    if (entity) {
+        return entity[0].unit
     }
     return null;
 }
@@ -138,6 +149,17 @@ var nlp = {
                 }
                 case "covid": {
                     reply = await getCovid();
+                    break;
+                }
+                case "convertCurrency": {
+                    const amount = getEntityValue(entities, "wit$amount_of_money:amount_of_money")
+                    const currencyFrom = getEntityUnit(entities, "wit$amount_of_money:amount_of_money")                 
+                    const currencyTo = getEntityValue(entities, "currency:currency")
+                    reply = await convertCurrency(currencyFrom, currencyTo, amount)
+                    break;
+                }
+                case "gasoline": {
+                    reply = await getGasolinePrice()
                     break;
                 }
                 case "dataCoin": {

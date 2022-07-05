@@ -2,7 +2,7 @@
   "name": "chatbot",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon server.js"
@@ -31,5 +31,8 @@
     "node-wit": "^6.2.2",
     "nodemon": "^2.0.16",
     "validator": "^13.7.0"
+  },
+  "engines": {
+    "node": "16.x"
   }
 }

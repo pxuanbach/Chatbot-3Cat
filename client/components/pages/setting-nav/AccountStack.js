@@ -5,28 +5,36 @@ import Account from "./account/Account";
 import Settings from "./Settings";
 import ChangePassword from "./ChangePassword";
 import Personal from "./Personal";
+import { SettingContext } from "../../../SettingContext";
 import { UserContext } from "../../../UserContext";
 
 const Stack = createNativeStackNavigator();
 
 const SettingStack = () => {
   return (
-    <UserContext.Consumer>
-        {({user, setUser}) => (
-            <Stack.Navigator>
-        <Stack.Screen
-          name="Account"
-          options={{ headerShown: false }}
-        >
-            {props => <Account {...props} user={user}/>}
-        </Stack.Screen>
-        <Stack.Screen name="Personal" component={Personal} />
-        <Stack.Screen name="Change Password" component={ChangePassword} />
-        <Stack.Screen name="Settings" component={Settings} />
-      </Stack.Navigator>
-        )}
-      
-    </UserContext.Consumer>
+    <SettingContext.Consumer>
+      {({ setting, setSetting }) => (
+        <Stack.Navigator>
+          <UserContext.Consumer>
+            {({ user, setUser }) => (
+              <Stack.Screen name="Account" options={{ headerShown: false }}>
+                {(props) => (
+                  <Account {...props} user={user} setSetting={setSetting} />
+                )}
+              </Stack.Screen>
+            )}
+          </UserContext.Consumer>
+
+          <Stack.Screen name="Personal" component={Personal} />
+          <Stack.Screen name="Change Password" component={ChangePassword} />
+          <Stack.Screen name="Settings">
+            {(props) => (
+              <Settings {...props} setting={setting} setSetting={setSetting} />
+            )}
+          </Stack.Screen>
+        </Stack.Navigator>
+      )}
+    </SettingContext.Consumer>
   );
 };
 
