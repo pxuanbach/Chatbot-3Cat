@@ -52,7 +52,6 @@ const Personal = ({ navigation }) => {
     }).then(res => res.json())
     .then(data => {
       setPhoto(data.url)
-      console.log(photo)
       handleUpdateAvatar(data.url)
     }).catch(err => console.log(err))
   }
@@ -67,6 +66,7 @@ const Personal = ({ navigation }) => {
       headers: { "Content-Type": "application/json" }
     }).then(response => {
       user.avatar = response.data.avatar;
+      setUser(user);
     }
     )
       .catch(error => {

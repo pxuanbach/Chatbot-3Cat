@@ -102,6 +102,7 @@ module.exports.updateAvatar = async (req, res) => {
                 let user = await User.findOneAndUpdate({ "username": username }, {
                     "avatar": avatar
                 });
+                user.avatar = avatar;
                 res.json(user);
             }
         })
