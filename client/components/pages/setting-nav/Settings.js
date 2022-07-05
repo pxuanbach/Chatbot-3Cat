@@ -1,45 +1,33 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, SafeAreaView } from "react-native";
 import { Slider } from "react-native-elements";
 import CustomCheckBox from "./CustomCheckBox";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { SettingContext } from "../../../SettingContext";
 
-const Settings = () => {
-  const { setting, setSetting } = useContext(SettingContext);
-  const [checkPronounce, setPronounce] = useState(false);
+const Settings = ({ setting, setSetting }) => {
+  const [checkPronounce, setPronounce] = useState(true);
   const [sliderValue, setSliderValue] = useState(10);
 
-  const handleCheckPronounce = async () => {
-    const value = !checkPronounce
-    setPronounce(value)
-    const curSetting = {
-      "isCheck": value,
-      "rate": sliderValue,
-      "voice": setting.voice
-    }
-    await AsyncStorage.setItem('@storage_setting', JSON.stringify(curSetting))
-    setSetting(curSetting) 
-  }
-
-  const handleSliderComplete = async (value) => {
-    setSliderValue(value)
-    const curSetting = {
-      "isCheck": checkPronounce,
-      "rate": value,
-      "voice": setting.voice
-    }
-    await AsyncStorage.setItem('@storage_setting', JSON.stringify(curSetting))
-    setSetting(curSetting) 
-  }
+  useEffect(() => {
+    // console.log(typeof setting.rate);
+    // console.log(setting)
+    setPronounce(setting.isCheck);
+    setSliderValue(setting.rate);
+  }, []);
 
   useEffect(() => {
-    if (setting) {
-      console.log(typeof setting.isCheck)
-      setPronounce(setting.isCheck === "true")
-      setSliderValue(parseInt(setting.rate))
-    }
-  }, [setting]);
+    const handleChangeSetting = async () => {
+      const curSetting = {
+        isCheck: checkPronounce,
+        rate: sliderValue,
+        voice: setting.voice,
+      };
+      await AsyncStorage.setItem("@storage_setting", JSON.stringify(curSetting));
+      setSetting(curSetting);
+    };
+
+    handleChangeSetting()
+  }, [checkPronounce, sliderValue])
 
   return (
     <View
@@ -59,7 +47,7 @@ const Settings = () => {
         <Text style={styles.title}>Music</Text>
         <View style={styles.checkboxContainer}>
           <CustomCheckBox
-            onPress={handleCheckPronounce}
+            onPress={() => setPronounce(!checkPronounce)}
             title="Always pronounce feedback"
             isChecked={checkPronounce}
           />
@@ -79,7 +67,7 @@ const Settings = () => {
           maximumTrackTintColor="#D0CECF"
           minimumTrackTintColor="#32B3FC"
           value={sliderValue}
-          onSlidingComplete={async (value) => handleSliderComplete(value)}
+          onSlidingComplete={(value) => setSliderValue(value)}
           thumbTintColor="white"
           thumbStyle={styles.thumb}
         />

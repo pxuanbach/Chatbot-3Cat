@@ -10,9 +10,9 @@ const ChatList = ({ messages }) => {
     return (
         <SafeAreaView style={styles.container}>
             <FlatList
-                keyExtractor={(item, index) => index.toString()}
+                keyExtractor={(item) => item._id.toString()}
                 data={messages}
-                renderItem={({ item }) => <ChatItem message={item} />}
+                renderItem={({ item }) => <ChatItem message={item}/>}
                 ref={messagesEndRef}
                 onContentSizeChange={() => {
                     messagesEndRef.current.scrollToEnd({ animated: true })

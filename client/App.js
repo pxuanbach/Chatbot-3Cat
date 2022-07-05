@@ -22,26 +22,34 @@ export default function App() {
       try {
         const settingStorage = await AsyncStorage.getItem("@storage_setting");
         if (settingStorage) {
-          const settingValue = JSON.parse(settingStorage)
-          setSetting(settingValue)
-          console.log(settingValue)
+          const settingValue = JSON.parse(settingStorage);
+          setSetting(settingValue);
+          console.log(settingValue);
         } else {
           const voices = await Speech.getAvailableVoicesAsync();
-          console.log(voices.length)
+          console.log(voices.length);
+          let curSetting = {
+            isCheck: true,
+            rate: 70,
+            voice: null,
+          };
           if (voices.length > 0) {
-            const viVoice = voices.find(voice => voice.language === "vi-VN")
-            const curSetting = {
-              "isCheck": true,
-              "rate": 70,
-              "voice": viVoice
-            }
-            await AsyncStorage.setItem('@storage_setting', JSON.stringify(curSetting))
-            setSetting(curSetting)
-            console.log(curSetting)
+            const viVoice = voices.find((voice) => voice.language === "vi-VN");
+            curSetting = {
+              isCheck: true,
+              rate: 70,
+              voice: viVoice,
+            };
           }
+          await AsyncStorage.setItem(
+            "@storage_setting",
+            JSON.stringify(curSetting)
+          );
+          setSetting(curSetting);
+          console.log(curSetting);
         }
-      } catch(err) {
-        console.log("error voice", err.message)
+      } catch (err) {
+        console.log("error voice", err.message);
       }
     };
 
@@ -50,22 +58,22 @@ export default function App() {
         const token = await AsyncStorage.getItem("@storage_token");
         if (token) {
           axiosInstance
-          .get(`/verifyuser/${token}`)
-          .then((response) => {
-            //response.data
-            console.log("data", response.data);
-            setUser(response.data);
-          })
-          .catch((err) => {
-            //err.response.data
-            console.log("error verify", err.response.data);
-          });
+            .get(`/verifyuser/${token}`)
+            .then((response) => {
+              //response.data
+              console.log("data", response.data);
+              setUser(response.data);
+            })
+            .catch((err) => {
+              //err.response.data
+              console.log("error verify", err.response.data);
+            });
         }
       } catch (error) {
         console.log("verify err", error.message);
       }
     };
-  
+
     listAllVoiceOptions();
     verifyUser();
   }, []);

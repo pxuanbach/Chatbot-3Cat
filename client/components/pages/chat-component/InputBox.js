@@ -8,23 +8,20 @@ import {
   TextInput,
 } from "react-native";
 import * as Speech from "expo-speech";
-import { SettingContext } from "../../../SettingContext";
 import { Octicons } from "@expo/vector-icons";
-import { SimpleLineIcons } from "@expo/vector-icons";
 import axiosInstance from "../../../AxiosInstance";
 
-const InputBox = ({ user, setMessages }) => {
-  const { setting } = useContext(SettingContext);
+const InputBox = ({ setting, user, setMessages }) => {
   const [message, setMessage] = useState("");
-  const [recording, setRecording] = useState();
 
   const speak = (text) => {
+    console.log(setting);
     const options = {
-      voice: setting?.voice.identifier,
+      voice: setting.voice.identifier,
       pitch: 1.0,
-      rate: (Number.parseFloat(setting.rate) / 100).toFixed(2),
+      rate: (Number.parseFloat(setting.rate) / 100),
     };
-    if (setting.isCheck === "true") {
+    if (setting.isCheck) {
       Speech.speak(text, options);
     }
   };
@@ -73,19 +70,6 @@ const InputBox = ({ user, setMessages }) => {
     >
       <View style={styles.container}>
         <View style={styles.mainContainer}>
-          <TouchableOpacity onPress={() => speak("Hello")}>
-            <View style={styles.buttonContainer}>
-              {recording ? (
-                <SimpleLineIcons
-                  name="control-pause"
-                  size={24}
-                  color="#7046E7"
-                />
-              ) : (
-                <SimpleLineIcons name="microphone" size={24} color="#7046E7" />
-              )}
-            </View>
-          </TouchableOpacity>
           <TextInput
             placeholder={"Type a message"}
             style={styles.textInput}
