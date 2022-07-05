@@ -38,7 +38,7 @@ export default function App() {
             curSetting = {
               isCheck: true,
               rate: 70,
-              voice: viVoice,
+              voice: viVoice ? viVoice : voices[0],
             };
           }
           await AsyncStorage.setItem(

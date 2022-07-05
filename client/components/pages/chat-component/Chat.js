@@ -3,11 +3,9 @@ import { View, StyleSheet, Text, Image, TouchableOpacity } from "react-native";
 import ChatList from "./ChatList";
 import InputBox from "./InputBox";
 import axiosInstance from "../../../AxiosInstance";
-import { UserContext } from "../../../UserContext";
 import { SettingContext } from "../../../SettingContext";
 
-const Chat = ({ navigation }) => {
-  const { user } = useContext(UserContext);
+const Chat = ({ navigation, user }) => {
   const [messages, setMessages] = useState([]);
 
   const handleClearAllMessage = () => {
@@ -24,18 +22,16 @@ const Chat = ({ navigation }) => {
   };
 
   useEffect(() => {
-    if (user) {
-      axiosInstance
-        .get(`/message/${user._id}`)
-        .then((response) => {
-          console.log(response.data);
-          setMessages(response.data);
-        })
-        .catch((err) => {
-          console.log(err.response.data);
-        });
-    }
-  }, [user]);
+    axiosInstance
+      .get(`/message/${user._id}`)
+      .then((response) => {
+        console.log(response.data);
+        setMessages(response.data);
+      })
+      .catch((err) => {
+        console.log(err.response.data);
+      });
+  }, []);
 
   return (
     <View style={styles.container}>
