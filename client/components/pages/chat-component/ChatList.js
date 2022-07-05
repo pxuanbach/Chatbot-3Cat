@@ -10,7 +10,7 @@ const ChatList = ({ messages }) => {
     return (
         <SafeAreaView style={styles.container}>
             <FlatList
-                keyExtractor={(item) => item._id.toString()}
+                keyExtractor={(item, index) => index}
                 data={messages}
                 renderItem={({ item }) => <ChatItem message={item}/>}
                 ref={messagesEndRef}

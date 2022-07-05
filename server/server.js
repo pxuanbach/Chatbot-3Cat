@@ -10,7 +10,7 @@ const bodyParser = require('body-parser');
 connectDB();
 
 const app = express();
-
+app.disable('etag');
 app.use(cors());
 app.use(express.json());
 app.use(bodyParser.json());

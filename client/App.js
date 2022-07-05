@@ -9,7 +9,6 @@ import ForgetPassword from "./components/pages/ForgetPassword";
 import { UserContext } from "./UserContext";
 import { SettingContext } from "./SettingContext";
 import axiosInstance from "./AxiosInstance";
-import * as Speech from "expo-speech";
 
 const Stack = createNativeStackNavigator();
 
@@ -74,13 +73,13 @@ export default function App() {
       }
     };
 
-    listAllVoiceOptions();
     verifyUser();
+    listAllVoiceOptions();
   }, []);
 
   return (
-    <SettingContext.Provider value={{ setting, setSetting }}>
-      <UserContext.Provider value={{ user, setUser }}>
+    <UserContext.Provider value={{ user, setUser }}>
+      <SettingContext.Provider value={{ setting, setSetting }}>
         <NavigationContainer>
           <Stack.Navigator initialRouteName="Log In">
             {user ? (
@@ -91,11 +90,9 @@ export default function App() {
               />
             ) : (
               <>
-                <Stack.Screen
-                  name="Log In"
-                  component={LogIn}
-                  options={{ headerShown: false }}
-                />
+                <Stack.Screen name="Log In" options={{ headerShown: false }}>
+                  {(props) => <LogIn {...props} setSetting={setSetting} />}
+                </Stack.Screen>
                 <Stack.Screen
                   name="Sign Up"
                   component={SignUp}
@@ -110,7 +107,7 @@ export default function App() {
             )}
           </Stack.Navigator>
         </NavigationContainer>
-      </UserContext.Provider>
-    </SettingContext.Provider>
+      </SettingContext.Provider>
+    </UserContext.Provider>
   );
 }

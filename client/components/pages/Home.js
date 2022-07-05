@@ -11,7 +11,7 @@ const Tab = createBottomTabNavigator();
 const Home = () => {
   return (
       <UserContext.Consumer>
-        {({user, setUser}) => (
+        {({user}) => (
           <Tab.Navigator tabBar={(props) => <Tabbar {...props} />}>
           <Tab.Screen
               name="Chat"

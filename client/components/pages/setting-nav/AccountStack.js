@@ -14,25 +14,29 @@ const SettingStack = () => {
   return (
     <SettingContext.Consumer>
       {({ setting, setSetting }) => (
-        <Stack.Navigator>
-          <UserContext.Consumer>
-            {({ user, setUser }) => (
+        <UserContext.Consumer>
+          {({ user, setUser }) => (
+            <Stack.Navigator>
               <Stack.Screen name="Account" options={{ headerShown: false }}>
                 {(props) => (
-                  <Account {...props} user={user} setSetting={setSetting} />
+                  <Account {...props} user={user} setUser={setUser} setSetting={setSetting} />
                 )}
               </Stack.Screen>
-            )}
-          </UserContext.Consumer>
 
-          <Stack.Screen name="Personal" component={Personal} />
-          <Stack.Screen name="Change Password" component={ChangePassword} />
-          <Stack.Screen name="Settings">
-            {(props) => (
-              <Settings {...props} setting={setting} setSetting={setSetting} />
-            )}
-          </Stack.Screen>
-        </Stack.Navigator>
+              <Stack.Screen name="Personal" component={Personal} />
+              <Stack.Screen name="Change Password" component={ChangePassword} />
+              <Stack.Screen name="Settings">
+                {(props) => (
+                  <Settings
+                    {...props}
+                    setting={setting}
+                    setSetting={setSetting}
+                  />
+                )}
+              </Stack.Screen>
+            </Stack.Navigator>
+          )}
+        </UserContext.Consumer>
       )}
     </SettingContext.Consumer>
   );

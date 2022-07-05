@@ -4,8 +4,10 @@ import ChatList from "./ChatList";
 import InputBox from "./InputBox";
 import axiosInstance from "../../../AxiosInstance";
 import { SettingContext } from "../../../SettingContext";
+import { UserContext } from "../../../UserContext";
 
-const Chat = ({ navigation, user }) => {
+const Chat = ({ navigation }) => {
+  const { user } = useContext(UserContext);
   const [messages, setMessages] = useState([]);
 
   const handleClearAllMessage = () => {
@@ -17,21 +19,25 @@ const Chat = ({ navigation, user }) => {
         }
       })
       .catch((err) => {
+        setMessages([])
         console.log(err.response.data.error);
       });
   };
 
   useEffect(() => {
-    axiosInstance
-      .get(`/message/${user._id}`)
-      .then((response) => {
-        console.log(response.data);
-        setMessages(response.data);
-      })
-      .catch((err) => {
-        console.log(err.response.data);
-      });
-  }, []);
+    if (user) {
+      axiosInstance
+        .get(`/message/${user._id}`)
+        .then((response) => {
+          console.log(response.data);
+          setMessages(response.data);
+        })
+        .catch((err) => {
+          setMessages([])
+          console.log("message list", err.response.data);
+        });
+    }
+  }, [user]);
 
   return (
     <View style={styles.container}>

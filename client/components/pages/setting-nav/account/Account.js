@@ -7,7 +7,7 @@ import OptionButton from './OptionButton';
 const { width } = Dimensions.get('screen');
 const imageSize = width / 3
 
-const Account = ({ navigation, setSetting, user}) => {
+const Account = ({ navigation, setSetting, user, setUser}) => {
 
   const handleLogout = async () => {
     try {

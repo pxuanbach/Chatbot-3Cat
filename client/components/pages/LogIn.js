@@ -8,8 +8,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import LinearGradientBackground from '../reusable/LinearGradientBackground';
 import axiosInstance from '../../AxiosInstance';
 import { UserContext } from '../../UserContext';
+import * as Speech from "expo-speech";
 
-const LogIn = ({ navigation }) => {
+const LogIn = ({ navigation, setSetting }) => {
   const { user, setUser } = useContext(UserContext);
   const [username, onChangeUsername] = useState('');
   const [usernameErr, onChangeUsernameErr] = useState('');
@@ -20,6 +21,41 @@ const LogIn = ({ navigation }) => {
     onChangeUsernameErr('')
     onChangePasswordErr('')
   }
+
+  const listAllVoiceOptions = async () => {
+    try {
+      const settingStorage = await AsyncStorage.getItem("@storage_setting");
+      if (settingStorage) {
+        const settingValue = JSON.parse(settingStorage);
+        setSetting(settingValue);
+        console.log(settingValue);
+      } else {
+        const voices = await Speech.getAvailableVoicesAsync();
+        console.log(voices.length);
+        let curSetting = {
+          isCheck: true,
+          rate: 70,
+          voice: null,
+        };
+        if (voices.length > 0) {
+          const viVoice = voices.find((voice) => voice.language === "vi-VN");
+          curSetting = {
+            isCheck: true,
+            rate: 70,
+            voice: viVoice ? viVoice : voices[0],
+          };
+        }
+        await AsyncStorage.setItem(
+          "@storage_setting",
+          JSON.stringify(curSetting)
+        );
+        setSetting(curSetting);
+        console.log(curSetting);
+      }
+    } catch (err) {
+      console.log("error voice", err.message);
+    }
+  };
 
   const handleLogin = async () => {
     resetStateErr();
@@ -33,6 +69,7 @@ const LogIn = ({ navigation }) => {
       //response.data
       setUser(response.data.user);
       await AsyncStorage.setItem('@storage_token', response.data.token)
+      await listAllVoiceOptions();
     }).catch(err => {
       //err.response.data
       const errors = err.response.data.errors

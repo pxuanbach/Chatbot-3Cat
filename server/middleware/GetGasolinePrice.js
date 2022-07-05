@@ -10,7 +10,7 @@ async function getGasolinePrice() {
             method: 'GET',
             url: 'https://fuel-prices2.p.rapidapi.com/gasoline/Vietnam',
             headers: {
-                'X-RapidAPI-Key': process.env.RAPIDAPI_KEY,
+                'X-RapidAPI-Key': process.env.RAPIDAPI_KEY2,
                 'X-RapidAPI-Host': 'fuel-prices2.p.rapidapi.com'
             }
         };
