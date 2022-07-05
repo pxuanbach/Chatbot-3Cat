@@ -1,26 +1,33 @@
-import React from 'react'
-import { View, Text, Button } from 'react-native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import Account from './account/Account';
-import Settings from './Settings';
-import ChangePassword from './ChangePassword';
-import Personal from './Personal'
+import React from "react";
+import { View, Text, Button } from "react-native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import Account from "./account/Account";
+import Settings from "./Settings";
+import ChangePassword from "./ChangePassword";
+import Personal from "./Personal";
+import { UserContext } from "../../../UserContext";
 
 const Stack = createNativeStackNavigator();
 
 const SettingStack = () => {
-    return (
-        <Stack.Navigator>
-            <Stack.Screen
-                name="Account"
-                component={Account}
-                options={{ headerShown: false }}
-            />
-            <Stack.Screen name="Personal" component={Personal} />
-            <Stack.Screen name="Change Password" component={ChangePassword} />
-            <Stack.Screen name="Settings" component={Settings} />
-        </Stack.Navigator>
-    )
-}
+  return (
+    <UserContext.Consumer>
+        {({user, setUser}) => (
+            <Stack.Navigator>
+        <Stack.Screen
+          name="Account"
+          options={{ headerShown: false }}
+        >
+            {props => <Account {...props} user={user}/>}
+        </Stack.Screen>
+        <Stack.Screen name="Personal" component={Personal} />
+        <Stack.Screen name="Change Password" component={ChangePassword} />
+        <Stack.Screen name="Settings" component={Settings} />
+      </Stack.Navigator>
+        )}
+      
+    </UserContext.Consumer>
+  );
+};
 
-export default SettingStack
+export default SettingStack;

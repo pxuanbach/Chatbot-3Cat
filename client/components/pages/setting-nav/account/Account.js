@@ -3,14 +3,12 @@ import { View, Text, Image, StyleSheet, Dimensions } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LinearGradientBackground from '../../../reusable/LinearGradientBackground';
 import OptionButton from './OptionButton';
-import {UserContext} from '../../../../UserContext'
 
 const { width } = Dimensions.get('screen');
 const imageSize = width / 3
 
-const Account = ({ navigation }) => {
-  const {user, setUser} = useContext(UserContext)
-  const [photo, setPhoto] = React.useState('https://haycafe.vn/wp-content/uploads/2021/11/Anh-avatar-dep-chat-lam-hinh-dai-dien.jpg');
+const Account = ({ navigation, user }) => {
+  const [photo, setPhoto] = React.useState('');
 
   const handleLogout = async () => {
     try {
@@ -21,13 +19,6 @@ const Account = ({ navigation }) => {
     }
   }
 
-  useEffect(() => {
-    if (user.avatar)
-    {
-      setPhoto(user.avatar)
-    }
-  }, [user.avatar])
-
   return (
     <View style={{ flex: 1, backgroundColor: 'rgba(255, 255, 255, 1)' }}>
       <LinearGradientBackground></LinearGradientBackground>
@@ -35,7 +26,8 @@ const Account = ({ navigation }) => {
         <View>
           <Image style={styles.image}
             source={{
-                uri: photo
+                uri: user.avatar ? user.avatar 
+                : 'https://haycafe.vn/wp-content/uploads/2021/11/Anh-avatar-dep-chat-lam-hinh-dai-dien.jpg'
             }}
           />
           <Text style={styles.nameText}>{user.name}</Text>
