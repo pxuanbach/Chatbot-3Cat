@@ -1,4 +1,4 @@
-import React, {useContext} from 'react'
+import React, {useContext, useEffect} from 'react'
 import { View, Text, Image, StyleSheet, Dimensions } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LinearGradientBackground from '../../../reusable/LinearGradientBackground';
@@ -10,6 +10,7 @@ const imageSize = width / 3
 
 const Account = ({ navigation }) => {
   const {user, setUser} = useContext(UserContext)
+  const [photo, setPhoto] = React.useState('https://haycafe.vn/wp-content/uploads/2021/11/Anh-avatar-dep-chat-lam-hinh-dai-dien.jpg');
 
   const handleLogout = async () => {
     try {
@@ -20,6 +21,13 @@ const Account = ({ navigation }) => {
     }
   }
 
+  useEffect(() => {
+    if (user.avatar)
+    {
+      setPhoto(user.avatar)
+    }
+  }, [user.avatar])
+
   return (
     <View style={{ flex: 1, backgroundColor: 'rgba(255, 255, 255, 1)' }}>
       <LinearGradientBackground></LinearGradientBackground>
@@ -27,11 +35,11 @@ const Account = ({ navigation }) => {
         <View>
           <Image style={styles.image}
             source={{
-              uri: 'https://res.cloudinary.com/ddpmmci58/image/upload/v1653104925/Club-Management/User-Avatar/z2irb3r9r4oyvkeennip.jpg'
+                uri: photo
             }}
           />
-          <Text style={styles.nameText}>Vũ Tân</Text>
-          <Text style={styles.roleText}>Học sinh</Text>
+          <Text style={styles.nameText}>{user.name}</Text>
+          <Text style={styles.roleText}>{user.username}</Text>
         </View>
         <View style={styles.groupButton}>
           <OptionButton
